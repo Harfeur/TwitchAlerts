@@ -1,0 +1,30 @@
+{
+  "name": "twitch-alerts",
+  "version": "2.0.0",
+  "description": "Get real time alerts on discord when going live on twitch",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Harfeur/TwitchAlerts.git"
+  },
+  "author": "Harfeur <contact@harfeur.fr> (https://www.harfeur.fr)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Harfeur/TwitchAlerts/issues"
+  },
+  "homepage": "https://twitchbot.harfeur.fr",
+  "dependencies": {
+    "@sapphire/time-utilities": "^1.7.5",
+    "colorette": "^2.0.19",
+    "discord.js": "^14.2.0",
+    "fuse.js": "^6.6.2",
+    "node-twitch": "^0.4.5",
+    "pg": "^8.7.3"
+  }
+}
