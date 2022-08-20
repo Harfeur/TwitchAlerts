@@ -4,8 +4,7 @@ exports.run = GeneralController.info;
 
 exports.commandData = {
     name: "info",
-    description: "Show Trucky mobile app download links, Trucky Discord server invite and issue tracker.",
-    options: []
+    description: "Show Twitch Alerts bot information and help."
 };
 
 exports.conf = {
