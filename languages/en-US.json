@@ -51,5 +51,7 @@
   "LANGUAGE_OPTION_NAME": "value",
   "LANGUAGE_OPTION_DESC": "The language to select for the alerts",
   "LANGUAGE_DEFAULT": "Server language",
+  "INFO_CMD_NAME": "info",
+  "INFO_CMD_DESC": "Show Twitch Alerts bot information and help",
   "LANGUAGE": "English"
 }
