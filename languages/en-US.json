@@ -22,7 +22,7 @@
   "INFO_LANGUAGE": "Change language",
   "INFO_LANGUAGE_DESC": "By default, alerts adapt to the server language. To change the server language, access the server settings, community tab. If you want to change the language of the alerts without changing the server language, use the command /{language}. Commands will always be displayed in the language of your Discord.",
   "INFO_TRANSLATE": "My language does not appear",
-  "INFO_TRANSLATE_DESC": "If your language does not appear, you can contribute by translating the bot on [Overleaf](https://harfeur.oneskyapp.com/collaboration/project?id=386943)",
+  "INFO_TRANSLATE_DESC": "If your language does not appear, you can contribute by translating the bot on [OneSky](https://harfeur.oneskyapp.com/collaboration/project?id=386943)",
   "INFO_INVITE": "Invite the bot",
   "INFO_SUPPORT": "Support server",
   "SETUP_TITLE": "Setup a new alert",
