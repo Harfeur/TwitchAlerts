@@ -18,7 +18,7 @@
   "INFO_PERMISSIONS": "Modifier les permissions",
   "INFO_PERMISSIONS_DESC": "Par défaut, seules les personnes avec la permission `Gérer le serveur` peuvent paramétrer le bot. Pour autoriser d'autres personnes à exécuter les commandes, accédez aux paramètres du serveur, puis dans l'onglet `Intégrations` modifiez les permissions associées aux commandes de Twitch Alerts.",
   "INFO_ERROR": "Les alertes ne s'affichent pas",
-  "INFO_ERROR_DESC": "Si aucune alerte n'apparait au bout d'une minute, alors que le streamer est en live, vérifiez que le bot possède les permissions suivantes dans le canal des alertes: `Voir les salons`, `Envoyer des messages` et `Intégrer des liens`",
+  "INFO_ERROR_DESC": "Si aucune alerte n'apparait au bout d'une minute, alors que le streamer est en live, vérifiez que le bot possède les permissions suivantes dans le canal des alertes: `Voir les salons`, `Envoyer des messages`, `Intégrer des liens` et `Voir les anciens messages`",
   "INFO_LANGUAGE": "Changer la langue",
   "INFO_LANGUAGE_DESC": "Par défaut, les alertes s'adaptent à la langue du serveur. Pour modifier la langue du serveur, accédez aux paramètres du serveur, onglet communauté. Si vous souhaitez modifier la langue des alertes sans modifier la langue du serveur, utilisez la commande /{language}. Les commandes seront toujours affichées dans la langue de votre Discord.",
   "INFO_TRANSLATE": "Ma langue n'apparait pas",

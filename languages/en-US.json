@@ -18,7 +18,7 @@
   "INFO_PERMISSIONS": "Change permissions",
   "INFO_PERMISSIONS_DESC": "By default, only people with the `Manage Server` permission can set up the bot. To allow other people to run commands, go to server settings, then in the `Integrations` tab change the permissions associated with Twitch Alerts commands.",
   "INFO_ERROR": "Alerts are not displayed",
-  "INFO_ERROR_DESC": "If no alerts appear after a minute, while the streamer is live, check that the bot has the following permissions in the alerts channel: `View Channels`, `Send Messages ` and `Embed Links`",
+  "INFO_ERROR_DESC": "If no alerts appear after a minute, while the streamer is live, check that the bot has the following permissions in the alerts channel: `View Channels`, `Send Messages`, `Embed Links` and `Read Message History`",
   "INFO_LANGUAGE": "Change language",
   "INFO_LANGUAGE_DESC": "By default, alerts adapt to the server language. To change the server language, access the server settings, community tab. If you want to change the language of the alerts without changing the server language, use the command /{language}. Commands will always be displayed in the language of your Discord.",
   "INFO_TRANSLATE": "My language does not appear",

@@ -1,5 +1,4 @@
 const {EmbedBuilder, PermissionsBitField} = require("discord.js");
-const logger = require("../modules/logger");
 const {getString} = require("../modules/language");
 
 class FetchLive {
@@ -37,7 +36,12 @@ class FetchLive {
                 const serveur = client.guilds.resolve(serverid);
                 if (serveur == null || !serveur.available) continue;
                 const canal = serveur.channels.resolve(canalid);
-                if (canal == null || !canal.permissionsFor(client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks, PermissionsBitField.Flags.ViewChannel])) continue;
+                if (canal == null || !canal.permissionsFor(client.user).has([
+                    PermissionsBitField.Flags.SendMessages,
+                    PermissionsBitField.Flags.EmbedLinks,
+                    PermissionsBitField.Flags.ViewChannel,
+                    PermissionsBitField.Flags.ReadMessageHistory
+                ])) continue;
 
                 const lang = row.language ?? serveur.preferredLocale;
 
@@ -96,7 +100,7 @@ class FetchLive {
                             embeds: [embed]
                         }).then(msg => {
                             client.container.pg.query(`UPDATE twitch SET messageID = '${msg.id}' WHERE channelID=${channelid} AND serverid='${serverid}';`)
-                        }).catch(logger.error);
+                        }).catch(console.error);
                     } else {
                         canal.messages.fetch(messageID)
                             .then(message => {
@@ -109,7 +113,7 @@ class FetchLive {
                                 if (err.code === 10008) {
                                     client.container.pg.query(`UPDATE twitch SET messageID = '0' WHERE channelID=${channelid} AND serverid='${serverid}';`)
                                 } else {
-                                    logger.error(err);
+                                    console.error(err);
                                 }
                             })
                     }
@@ -151,7 +155,7 @@ class FetchLive {
                                     message.edit(`${messageFin} <${video.url}>`).catch(console.error);
                                 }
                             }
-                        }).catch(logger.error)
+                        }).catch(console.error)
                 }
             }
         }
