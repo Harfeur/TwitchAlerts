@@ -20,11 +20,11 @@
   },
   "homepage": "https://twitchbot.harfeur.fr",
   "dependencies": {
-    "@sapphire/time-utilities": "^1.7.5",
+    "@sapphire/time-utilities": "^1.7.8",
     "colorette": "^2.0.19",
-    "discord.js": "^14.2.0",
+    "discord.js": "^14.7.1",
     "fuse.js": "^6.6.2",
-    "node-twitch": "^0.4.5",
-    "pg": "^8.7.3"
+    "node-twitch": "^0.5.0",
+    "pg": "^8.8.0"
   }
 }
