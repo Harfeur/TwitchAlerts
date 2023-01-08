@@ -35,10 +35,11 @@ module.exports = function (oauth, cookies) {
         }
         if (data.timeGuilds + 60000 <= Date.now()) { // Refresh guilds
              try {
-                let guilds = oauth.getUserGuilds(data.access_token);
+                let guilds = await oauth.getUserGuilds(data.access_token);
                 cookies.set(cookie, {
                     ...data,
-                    guilds: guilds
+                    guilds: guilds,
+                    timeGuilds: Date.now()
                 });
             } catch (err) {
                 console.error(err);
