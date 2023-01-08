@@ -167,6 +167,9 @@
 
 [data-theme="dark"] .btn {
   --bs-btn-color: #fff;
+}
+
+[data-theme="dark"] .btn-light {
   --bs-btn-bg: #27262e;
   --bs-btn-border-color: #27262e;
   --bs-btn-hover-color: #fff;
