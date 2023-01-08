@@ -167,6 +167,19 @@
 
 [data-theme="dark"] .btn {
   --bs-btn-color: #fff;
+  --bs-btn-bg: #27262e;
+  --bs-btn-border-color: #27262e;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #47474d;
+  --bs-btn-hover-border-color: #3d3c43;
+  --bs-btn-focus-shadow-rgb: 71, 71, 77;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #525158;
+  --bs-btn-active-border-color: #3d3c43;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #27262e;
+  --bs-btn-disabled-border-color: #27262e;
 }
 
 [data-theme="dark"] .btn-secondary {
