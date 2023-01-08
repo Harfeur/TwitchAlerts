@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Tableau de bord - Twitch Alerts</title>
+    <meta name="theme-color" content="#9146ff">
+    <meta property="og:description" content="Alertes Twitch en temps réel - Le meilleur choix pour des alertes Twitch sur Discord">
+    <meta name="twitter:description" content="Alertes Twitch en temps réel - Le meilleur choix pour des alertes Twitch sur Discord">
+    <meta property="og:title" content="Twitch Alerts">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://twitchbot.harfeur.fr/assets/img/icons/icon512.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Twitch Alerts">
+    <meta name="description" content="Gérer vos alertes en un coup d'oeil grâce au tout nouveau tableau de bord !">
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/icons/icon180.png?h=a6cedebb66b8bdd78d27bf038f78ef5b">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/icons/icon16.png?h=99605fa9b2292d3fc5e6ad96866f1a02">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/icons/icon32.png?h=6ae27867b8e1087b5928bfedcfd8da04">
+    <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/icons/icon180.png?h=a6cedebb66b8bdd78d27bf038f78ef5b">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/icons/icon192.png?h=f0ab3d72d3828d68c58b734de28a9739">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/icons/icon512.png?h=6369af451e4c9296c1fd74d8c306c795">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css?h=63c49130f916e8761302328c73ff1917">
+    <link rel="manifest" href="/manifest.json?h=c7082dfc9a761ff3c745545c73a40c51">
+    <link rel="stylesheet" href="/assets/css/Inter.css?h=ca5b01551b2ed6960d581fe701b94e17">
+    <link rel="stylesheet" href="/assets/css/Inter.css?h=e473b87bea66cbfe9e7a3d97bcc7a0bb">
+    <link rel="stylesheet" href="/assets/css/custom.css?h=4fe189d58222f5821b79c258ceda4572">
+    <link rel="stylesheet" href="/assets/css/dark-mode.css?h=da73fc6320290815a2be25c4e8dd9431">
+    <link rel="stylesheet" href="/assets/css/Fully-responsive-table.css?h=a134b67f31f22bff9c0f1541d450b4ed">
+</head>
+
+<body>
+    <!-- Start: Navbar Centered Links -->
+    <nav class="navbar navbar-light navbar-expand-md sticky-top navbar-shrink py-3" id="mainNav">
+        <div class="container"><a class="navbar-brand d-flex align-items-center" href="/"><img class="border rounded-circle me-2 bs-icon" src="/assets/img/icons/icon32.png?h=6ae27867b8e1087b5928bfedcfd8da04"><span>Twitch Alerts</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+                    <li class="nav-item"></li>
+                    <li class="nav-item"><a class="nav-link" href="https://discord.gg/uY98wtmvXf" target="_blank">Support</a></li>
+                    <li class="nav-item">
+                        <div class="nav-link">
+                            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="darkSwitch"><label class="form-check-label" for="darkSwitch">Mode sombre</label></div>
+                        </div>
+                    </li>
+                </ul><a class="btn btn-primary shadow" role="button" href="/dashboard">Tableau de bord</a>
+            </div>
+        </div>
+    </nav><!-- End: Navbar Centered Links -->
+    <section class="py-5">
+        <!-- Start: Active servers -->
+        <div class="container py-5 bg-primary-gradient">
+            <div class="row mb-4 mb-lg-5">
+                <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <h2 class="fw-bold">Mes serveurs</h2>
+                    <p class="text-muted w-lg-50">Liste des serveurs auxquels vous avez les permissions de gérer le bot (permission <strong>Gérer le serveur</strong>)</p>
+                </div>
+            </div><!-- Start: Loading -->
+            <div class="row mb-4 mb-lg-5 loading">
+                <div class="col-md-8 col-xl-6 text-center mx-auto"><span class="spinner-grow text-info" role="status"></span>
+                    <p>Chargement en cours...</p>
+                </div>
+            </div><!-- End: Loading -->
+            <div class="row row-cols-2 row-cols-md-3 mx-auto" id="active" style="max-width: 700px;"></div>
+        </div><!-- End: Active servers -->
+    </section>
+    <section class="py-5">
+        <!-- Start: Inactive servers -->
+        <div class="container py-5">
+            <div class="row mb-4 mb-lg-5">
+                <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <h2 class="fw-bold">Autres serveurs</h2>
+                    <p class="text-muted w-lg-50">Liste des serveurs auxquels vous pouvez ajouter le bot (permission <strong>Gérer le serveur</strong>)</p>
+                </div>
+            </div><!-- Start: Loading -->
+            <div class="row mb-4 mb-lg-5 loading">
+                <div class="col-md-8 col-xl-6 text-center mx-auto"><span class="spinner-grow text-info" role="status"></span>
+                    <p>Chargement en cours...</p>
+                </div>
+            </div><!-- End: Loading -->
+            <div class="row row-cols-2 row-cols-md-3 mx-auto" id="inactive" style="max-width: 700px;"></div>
+        </div><!-- End: Inactive servers -->
+    </section><!-- Start: Footer Multi Column -->
+    <footer class="bg-primary-gradient">
+        <div class="container py-4 py-lg-5">
+            <div class="row justify-content-center">
+                <!-- Start: Services -->
+                <div class="col-sm-4 col-md-3 text-center text-lg-start d-flex flex-column item">
+                    <h3 class="fs-6 fw-bold">Sources</h3>
+                    <ul class="list-unstyled">
+                        <li><a href="https://github.com/Harfeur/TwitchAlerts">GitHub</a></li>
+                        <li><a href="https://discord.com/application-directory/748846588163784794">Discord</a></li>
+                    </ul>
+                </div><!-- End: Services -->
+                <!-- Start: About -->
+                <div class="col-sm-4 col-md-3 text-center text-lg-start d-flex flex-column item">
+                    <h3 class="fs-6 fw-bold">À propos</h3>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.harfeur.fr/">Harfeur</a></li>
+                        <li><a href="/terms-of-service.html">Conditions d'utilisation</a></li>
+                        <li><a href="/privacy-policy.html">Politique de confidentialité</a></li>
+                    </ul>
+                </div><!-- End: About -->
+                <!-- Start: Social Icons -->
+                <div class="col-lg-3 text-center text-lg-start d-flex flex-column align-items-center order-first align-items-lg-start order-lg-last item social">
+                    <div class="fw-bold d-flex align-items-center mb-2"><img class="border rounded-circle bs-icon me-2" src="/assets/img/icons/icon32.png?h=6ae27867b8e1087b5928bfedcfd8da04"><span>Twitch Alerts</span></div>
+                    <p class="text-muted copyright">Le meilleur choix pour des alertes Twitch sur Discord</p>
+                </div><!-- End: Social Icons -->
+            </div>
+            <hr>
+            <div class="text-muted d-flex justify-content-between align-items-center pt-3">
+                <p class="mb-0">CC BY-NC-SA 4.0</p>
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item"><a href="https://social.linux.pizza/@harfeur" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-mastodon">
+                                <path d="M11.19 12.195c2.016-.24 3.77-1.475 3.99-2.603.348-1.778.32-4.339.32-4.339 0-3.47-2.286-4.488-2.286-4.488C12.062.238 10.083.017 8.027 0h-.05C5.92.017 3.942.238 2.79.765c0 0-2.285 1.017-2.285 4.488l-.002.662c-.004.64-.007 1.35.011 2.091.083 3.394.626 6.74 3.78 7.57 1.454.383 2.703.463 3.709.408 1.823-.1 2.847-.647 2.847-.647l-.06-1.317s-1.303.41-2.767.36c-1.45-.05-2.98-.156-3.215-1.928a3.614 3.614 0 0 1-.033-.496s1.424.346 3.228.428c1.103.05 2.137-.064 3.188-.189zm1.613-2.47H11.13v-4.08c0-.859-.364-1.295-1.091-1.295-.804 0-1.207.517-1.207 1.541v2.233H7.168V5.89c0-1.024-.403-1.541-1.207-1.541-.727 0-1.091.436-1.091 1.296v4.079H3.197V5.522c0-.859.22-1.541.66-2.046.456-.505 1.052-.764 1.793-.764.856 0 1.504.328 1.933.983L8 4.39l.417-.695c.429-.655 1.077-.983 1.934-.983.74 0 1.336.259 1.791.764.442.505.661 1.187.661 2.046v4.203z"></path>
+                            </svg></a></li>
+                </ul>
+            </div>
+        </div>
+    </footer><!-- End: Footer Multi Column -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/dark-mode-switch.js?h=f8a0d73dfc83b2c233eb174039dfdc55"></script>
+    <script src="/assets/js/dashboard.js?h=67aac160fbf0f17ce4bd3bc5d2691aae"></script>
+    <script src="/assets/js/navbar.js?h=914b066f52f5e2b2583e4d1558c90518"></script>
+</body>
+
+</html>

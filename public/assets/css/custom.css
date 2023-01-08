@@ -1,0 +1,16 @@
+.channelMention {
+  color: rgb(88,101,242);
+  background-color: rgba(88,101,242,0.15);
+  transition: background-color 50ms ease-out,color 50ms ease-out;
+  cursor: pointer;
+}
+
+.channelMention:hover {
+  color: white;
+  background-color: rgb(88,101,242);
+}
+
+.channelIcon {
+  width: 1.05rem;
+}
+
