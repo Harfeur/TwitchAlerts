@@ -81,7 +81,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 }
 
                 try {
-                    let query = await pgsql.query(`UPDATE twitch SET canalid='${channel.id}' WHERE channelid=${req.body.streamer_id} AND serverid='${req.body.guild_id.replaceAll("'", "''")}'`);
+                    let query = await pgsql.query(`UPDATE twitch SET canalid='${channel.id}', messageid='0' WHERE channelid=${req.body.streamer_id} AND serverid='${req.body.guild_id.replaceAll("'", "''")}'`);
                     console.log(query);
                     res.send({
                         channel_id: channel.id, channel_name: channel.name
