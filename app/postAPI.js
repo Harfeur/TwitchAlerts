@@ -74,7 +74,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                         channel = guild.channels.cache.find(c => c.name === req.body.channel);
                         if (!channel) throw Exception("Non trouvé");
                     }
-                    if (channel.type !== Discord.ChannelType.GuildText) throw Exception("Canal non texte");
+                    if (channel.type !== Discord.ChannelType.GuildText && channel.type !== Discord.ChannelType.GuildAnnouncement) throw Exception("Canal non texte");
                 } catch (e) {
                     res.sendStatus(404);
                     return;
@@ -121,7 +121,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                         channel = guild.channels.cache.find(c => c.name === req.body.channel);
                         if (!channel) throw Exception("Non trouvé");
                     }
-                    if (channel.type !== Discord.ChannelType.GuildText) throw Exception("Canal non texte");
+                    if (channel.type !== Discord.ChannelType.GuildText && channel.type !== Discord.ChannelType.GuildAnnouncement) throw Exception("Canal non texte");
                 } catch (e) {
                     res.sendStatus(404);
                     return;
