@@ -80,7 +80,11 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     time: Date.now(), timeGuilds: Date.now(), id: user.id, guilds: guilds, ...data
                 });
 
-                res.cookie("user", cookie);
+                res.cookie("user", cookie, {
+                    maxAge: 3600000 * 24 * 30,
+                    secure: true,
+                    httpOnly: true
+                });
                 res.redirect("/dashboard");
             } catch (err) {
                 res.sendStatus(500);
