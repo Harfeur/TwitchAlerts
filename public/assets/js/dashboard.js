@@ -1,12 +1,14 @@
-$(document).ready(function() {
+$(() => {
     $.get('/servers').done(data => {
         data.active.forEach(server => {
-            let serverImage = $("<img class='rounded mb-3 fit-cover' width='150' height='150'>").attr("src", server.icon);
+            let serverImage = $(`<img class='rounded mb-3 fit-cover' width='150' height='150' src='${server.icon}' alt='Server icon'>`);
             let serverLink = $("<a>").attr("href", `/dashboard/${server.id}`).append(serverImage);
 
             let serverName = $("<h5 class='fw-bold mb-0'>").append($("<strong>").text(server.name));
 
-            let serverAlerts = $("<p class='text-muted mb-2'>").text(`${server.alerts} alerte${server.alerts >= 2 ? "s" : ""}`);
+            let serverAlerts = $("<p class='text-muted mb-2'>")
+                .append($("<span>").text(server.alerts + "\xa0"))
+                .append($(`<span data-i18n='alert${server.alerts >= 2 ? 2 : 1}'>`));
 
             let element = $("<div class='col mb-4'>").append(
                 $("<div class='text-center'>").append([serverLink, serverName, serverAlerts])
@@ -15,8 +17,7 @@ $(document).ready(function() {
         });
 
         data.inactive.forEach(server => {
-            let serverImage = $("<img class='rounded mb-3 fit-cover' width='150' height='150' style='filter: grayscale(100%);'>")
-                .attr("src", server.icon);
+            let serverImage = $(`<img class='rounded mb-3 fit-cover' width='150' height='150' src='${server.icon}' alt='Server icon' style='filter: grayscale(100%);'>`);
             let serverLink = $("<a target='_blank'>").attr("href", server.invite).append(serverImage);
 
             let serverName = $("<h5 class='fw-bold mb-0'>").append($("<strong>").text(server.name));
@@ -28,7 +29,11 @@ $(document).ready(function() {
         });
 
         $(".loading").hide();
+
+        translatePage();
     }).fail(error => {
-        $(".loading").text(`Erreur : ${error}`)
+        $(".loading")
+            .append($("<span data-i18n='error'>"))
+            .append($("<span>").text(error.responseText));
     })
 });
