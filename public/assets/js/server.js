@@ -48,7 +48,7 @@ function createAlert(alert, data) {
                     // Reset and close modal
                     $("#modal-edit").modal('toggle');
                     $("#form-edit").trigger("reset").off("submit");
-                    $("#form-edit [type='submit']").attr("disabled", "");
+                    $("#form-edit [type='submit']").removeAttr("disabled");
                 }).fail(err => {
                     let alertMsg = $("<span>");
                     let alert = $("<div class='alert alert-danger alert-dismissible' role='alert'>")
@@ -72,7 +72,7 @@ function createAlert(alert, data) {
                             break;
                     }
                     $("#form-edit .modal-body").prepend(alert);
-                    $("#form-edit [type='submit']").attr("disabled", "");
+                    $("#form-edit [type='submit']").removeAttr("disabled");
                 });
             });
         });
@@ -99,7 +99,7 @@ function createAlert(alert, data) {
                     // Reset and close modal
                     $("#modal-move").modal('toggle');
                     $("#form-move").trigger("reset").off("submit");
-                    $("#form-move [type='submit']").attr("disabled", "");
+                    $("#form-move [type='submit']").removeAttr("disabled");
                 }).fail(err => {
                     let alertMsg = $("<span>");
                     let alert = $("<div class='alert alert-danger alert-dismissible' role='alert'>")
@@ -120,7 +120,7 @@ function createAlert(alert, data) {
                             break;
                     }
                     $("#form-move .modal-body").prepend(alert);
-                    $("#form-move [type='submit']").attr("disabled", "");
+                    $("#form-move [type='submit']").removeAttr("disabled");
                 });
             });
         });
@@ -149,7 +149,7 @@ function createAlert(alert, data) {
                     // Reset and close modal
                     $("#modal-duplicate").modal('toggle');
                     $("#form-duplicate").trigger("reset").off("submit");
-                    $("#form-duplicate [type='submit']").attr("disabled", "");
+                    $("#form-duplicate [type='submit']").removeAttr("disabled");
                 }).fail(err => {
                     let alertMsg = $("<span>");
                     let alert = $("<div class='alert alert-danger alert-dismissible' role='alert'>")
@@ -176,7 +176,7 @@ function createAlert(alert, data) {
                             break;
                     }
                     $("#form-duplicate .modal-body").prepend(alert);
-                    $("#form-duplicate [type='submit']").attr("disabled", "");
+                    $("#form-duplicate [type='submit']").removeAttr("disabled");
                 });
             });
         });
@@ -197,7 +197,7 @@ function createAlert(alert, data) {
                     // Reset and close modal
                     $("#modal-delete").modal('toggle');
                     $("#form-delete").trigger("reset").off("submit");
-                    $("#form-delete [type='submit']").attr("disabled", "");
+                    $("#form-delete [type='submit']").removeAttr("disabled");
                 }).fail(err => {
                     let alertMsg = $("<span>");
                     let alert = $("<div class='alert alert-danger alert-dismissible' role='alert'>")
@@ -215,7 +215,7 @@ function createAlert(alert, data) {
                             break;
                     }
                     $("#form-delete .modal-body").prepend(alert);
-                    $("#form-delete [type='submit']").attr("disabled", "");
+                    $("#form-delete [type='submit']").removeAttr("disabled");
                 });
             });
         });
@@ -257,7 +257,7 @@ $(() => {
                     // Reset and close modal
                     $("#modal-create").modal('toggle');
                     $("#form-create").trigger("reset").off("submit");
-                    $("#form-create [type='submit']").attr("disabled", "");
+                    $("#form-create [type='submit']").removeAttr("disabled");
                 }).fail(err => {
                     let alertMsg = $("<span>");
                     let alert = $("<div class='alert alert-danger alert-dismissible' role='alert'>")
@@ -284,7 +284,7 @@ $(() => {
                             break;
                     }
                     $("#form-create .modal-body").prepend(alert);
-                    $("#form-create [type='submit']").attr("disabled", "");
+                    $("#form-create [type='submit']").removeAttr("disabled");
                 });
             });
         });
