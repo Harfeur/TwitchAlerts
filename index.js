@@ -10,6 +10,7 @@ const TwitchApi = require('node-twitch').default;
 const {readdirSync} = require("fs");
 const {intents, partials} = require("./config");
 const logger = require("./modules/logger");
+const {translateCommand} = require("./modules/language");
 
 const client = new Client({intents, partials});
 
@@ -26,6 +27,8 @@ const init = async () => {
         const command = require(`./slash/${file}`);
         const commandName = file.split(".")[0];
         logger.log(`Loading Slash command: ${commandName}. 👌`, "log");
+
+        translateCommand(command, commandName);
 
         client.container.slashcmds.set(command.commandData.name, command);
     }

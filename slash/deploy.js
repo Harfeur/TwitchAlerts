@@ -22,5 +22,6 @@ exports.commandData = {
 };
 
 exports.conf = {
-    guildOnly: true
+    guildOnly: true,
+    translate: false
 };

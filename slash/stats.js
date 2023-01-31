@@ -8,5 +8,6 @@ exports.commandData = {
 };
 
 exports.conf = {
-    guildOnly: false
+    guildOnly: false,
+    translate: false
 };
