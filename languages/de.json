@@ -14,7 +14,7 @@
     "STATS_SERVERS": "Server",
     "STATS_CHANNELS": "Kan\u00e4le",
     "INFO_TITLE": "Informationen und Hilfe",
-    "INFO_DESCRIPTION": "Dieser Bot erm\u00f6glicht dir, einen Alert w\u00e4hrend eines Twitch-Livestreams anzuzeigen und die Nachricht regelm\u00e4\u00dfig zu aktualisieren. Nachrichten und Sprachen sind anpassbar. Beginne mit `\/{setup}` um, einen neuen Alert zu erstellen.",
+    "INFO_DESCRIPTION": "Dieser Bot erm\u00f6glicht dir, einen Alert w\u00e4hrend eines Twitch-Livestreams anzuzeigen und die Nachricht regelm\u00e4\u00dfig zu aktualisieren. Nachrichten und Sprachen sind anpassbar. Beginne mit `\/{setup}`, um einen neuen Alert zu erstellen.",
     "INFO_PERMISSIONS": "Berechtigungen ver\u00e4ndern",
     "INFO_PERMISSIONS_DESC": "Standardm\u00e4\u00dfig k\u00f6nnen nur Leute mit der Berechtigung `Server verwalten` den Bot verwalten. Um anderen Leuten das Ausf\u00fchren von Befehlen zu erlauben, gehe in die Servereinstellungen, dann zu `Integrationen` und \u00e4ndere die Berechtigungen bez\u00fcglich Twitch Alerts Befehle.",
     "INFO_ERROR": "Alerts werden nicht angezeigt",
