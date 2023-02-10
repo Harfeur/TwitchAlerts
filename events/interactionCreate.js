@@ -14,7 +14,7 @@ module.exports = async (client, interaction) => {
         if (interaction.type === InteractionType.ApplicationCommand) {
             logger.log(`${interaction.user.id} ran slash command ${interaction.commandName}`, "cmd");
             await cmd.run(client, interaction);
-        } else if (interaction.isSelectMenu()) {
+        } else if (interaction.isAnySelectMenu()) {
             await cmd.selectMenu(client, interaction);
         } else if (interaction.isModalSubmit()) {
             await cmd.modalSubmit(client, interaction);
