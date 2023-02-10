@@ -13,6 +13,7 @@ exports.log = (content, type = "log") => {
         case "warn":
             return console.log(`${timestamp} ${yellow(type.toUpperCase())} ${content} `);
         case "error":
+            console.error(content);
             return console.log(`${timestamp} ${red(type.toUpperCase())} ${content} `);
         case "debug":
             return console.log(`${timestamp} ${magenta(type.toUpperCase())} ${content} `);

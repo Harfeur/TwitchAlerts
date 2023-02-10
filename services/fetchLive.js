@@ -1,5 +1,6 @@
 const {EmbedBuilder, PermissionsBitField} = require("discord.js");
 const {getString} = require("../modules/language");
+const {logger} = require("../modules/logger");
 
 class FetchLive {
     constructor(client) {
@@ -100,7 +101,7 @@ class FetchLive {
                             embeds: [embed]
                         }).then(msg => {
                             client.container.pg.query(`UPDATE twitch SET messageID = '${msg.id}' WHERE channelID=${channelid} AND serverid='${serverid}';`)
-                        }).catch(console.error);
+                        }).catch(logger.error);
                     } else {
                         canal.messages.fetch(messageID)
                             .then(message => {
@@ -113,7 +114,7 @@ class FetchLive {
                                 if (err.code === 10008) {
                                     client.container.pg.query(`UPDATE twitch SET messageID = '0' WHERE channelID=${channelid} AND serverid='${serverid}';`)
                                 } else {
-                                    console.error(err);
+                                    logger.error(err);
                                 }
                             })
                     }
@@ -137,9 +138,9 @@ class FetchLive {
                                     message.edit({
                                         content: messageFin,
                                         embeds: [embed]
-                                    }).catch(console.error);
+                                    }).catch(logger.error);
                                 } else {
-                                    message.edit(messageFin).catch(console.error);
+                                    message.edit(messageFin).catch(logger.error);
                                 }
                             } else {
                                 if (message.embeds.length > 0) {
@@ -150,12 +151,12 @@ class FetchLive {
                                     message.edit({
                                         content: `${messageFin} <${video.url}>`,
                                         embeds: [embed]
-                                    }).catch(console.error);
+                                    }).catch(logger.error);
                                 } else {
-                                    message.edit(`${messageFin} <${video.url}>`).catch(console.error);
+                                    message.edit(`${messageFin} <${video.url}>`).catch(logger.error);
                                 }
                             }
-                        }).catch(console.error)
+                        }).catch(logger.error)
                 }
             }
         }

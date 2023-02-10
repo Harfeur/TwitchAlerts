@@ -15,7 +15,6 @@ module.exports = function (oauth, cookies) {
         let data = cookies.get(cookie)
         if (data.expires_in * 1000 + data.time <= Date.now() + 60000) {
             let res;
-            console.log("Token expiré");
             try {
                 res = await oauth.tokenRequest({
                     refreshToken: data.refreshToken,
@@ -31,7 +30,6 @@ module.exports = function (oauth, cookies) {
                 time: Date.now()
             });
             data = cookies.get(cookie);
-            console.log("Token mis à jour");
         }
         if (data.timeGuilds + 60000 <= Date.now()) { // Refresh guilds
              try {
