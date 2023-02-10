@@ -1,6 +1,6 @@
 const {EmbedBuilder, PermissionsBitField} = require("discord.js");
 const {getString} = require("../modules/language");
-const {logger} = require("../modules/logger");
+const logger = require("../modules/logger");
 
 class FetchLive {
     constructor(client) {
