@@ -24,7 +24,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 try {
                     let guild = await discord.guilds.fetch(req.body.guild_id);
                     let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
-                    if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Exception("Permissions insuffisantes pour l'utilisateur");
+                    if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
                 } catch (err) {
                     console.error(err);
                     res.sendStatus(401);
@@ -59,7 +59,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 try {
                     guild = await discord.guilds.fetch(req.body.guild_id);
                     let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
-                    if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Exception("Permissions insuffisantes pour l'utilisateur");
+                    if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
                 } catch (err) {
                     console.error(err);
                     res.sendStatus(401);
@@ -72,9 +72,9 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                         channel = await guild.channels.fetch(req.body.channel);
                     } else {
                         channel = guild.channels.cache.find(c => c.name === req.body.channel);
-                        if (!channel) throw Exception("Non trouvé");
+                        if (!channel) throw new Error("Non trouvé");
                     }
-                    if (channel.type !== Discord.ChannelType.GuildText && channel.type !== Discord.ChannelType.GuildAnnouncement) throw Exception("Canal non texte");
+                    if (channel.type !== Discord.ChannelType.GuildText && channel.type !== Discord.ChannelType.GuildAnnouncement) throw new Error("Canal non texte");
                 } catch (e) {
                     res.sendStatus(404);
                     return;
@@ -106,7 +106,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 try {
                     guild = await discord.guilds.fetch(req.body.guild_id);
                     let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
-                    if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Exception("Permissions insuffisantes pour l'utilisateur");
+                    if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
                 } catch (err) {
                     console.error(err);
                     res.sendStatus(401);
@@ -119,9 +119,9 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                         channel = await guild.channels.fetch(req.body.channel);
                     } else {
                         channel = guild.channels.cache.find(c => c.name === req.body.channel);
-                        if (!channel) throw Exception("Non trouvé");
+                        if (!channel) throw new Error("Non trouvé");
                     }
-                    if (channel.type !== Discord.ChannelType.GuildText && channel.type !== Discord.ChannelType.GuildAnnouncement) throw Exception("Canal non texte");
+                    if (channel.type !== Discord.ChannelType.GuildText && channel.type !== Discord.ChannelType.GuildAnnouncement) throw new Error("Canal non texte");
                 } catch (e) {
                     res.sendStatus(404);
                     return;
@@ -169,7 +169,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 try {
                     let guild = await discord.guilds.fetch(req.body.guild_id);
                     let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
-                    if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Exception("Permissions insuffisantes pour l'utilisateur");
+                    if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
                 } catch (err) {
                     console.error(err);
                     res.sendStatus(401);

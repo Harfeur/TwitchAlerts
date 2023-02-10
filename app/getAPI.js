@@ -43,7 +43,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
             try {
                 let guild = await discord.guilds.fetch(req.params.guild_id);
                 let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
-                if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Exception("Permissions insuffisantes pour l'utilisateur");
+                if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
             } catch (err) {
                 console.error(err);
                 res.redirect("/dashboard");
@@ -150,7 +150,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
             try {
                 guild = await discord.guilds.fetch(req.query.server);
                 let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
-                if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Exception("Permissions insuffisantes pour l'utilisateur");
+                if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
             } catch (err) {
                 console.error(err);
                 res.sendStatus(401);
