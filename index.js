@@ -52,17 +52,6 @@ const init = async () => {
     client.container.twitch = new ApiClient({authProvider});
 
     await client.login(process.env.TWITCHBOT);
-
-    const middleware = new EventSubMiddleware({
-        apiClient: client.container.twitch,
-        hostName: 'twitchbot.harfeur.fr',
-        pathPrefix: '/twitch',
-        secret: process.env.MY_SECRET
-    });
-    const fl = new FetchLive(client, middleware);
-
-    await require('./web.js')(client.container.pg, client, client.container.twitch, fl);
-
 };
 
 init();
