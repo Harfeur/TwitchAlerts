@@ -38,6 +38,9 @@ class FetchLive {
                 this.subscriptions.set(alert.alert_streamer, [ev1, ev2]);
             }
         }
+
+        await this.checkCurrentStreams();
+        // setInterval(this.fetchLive, 60000);
     }
 
     async checkCurrentStreams() {
