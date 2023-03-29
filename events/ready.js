@@ -6,4 +6,5 @@ module.exports = async client => {
     const fetchLive = new FetchLive(client);
     setInterval(fetchLive.fetchLive, 90000, client)
     await client.application.fetch();
+    await fetchLive.fetchLive(client);
 };

@@ -1,19 +1,19 @@
 const express = require('express');
-const {Client} = require('pg');
+const Database = require('../models/database');
 const DiscordOauth2 = require("discord-oauth2");
 const Discord = require('discord.js');
 const {PermissionsBitField} = require("discord.js");
-const {default: TwitchApi} = require("node-twitch");
+const {ApiClient} = require("@twurple/api");
 const f = require("./functions");
 
 const SCOPE = "guilds identify guilds.members.read";
 
 /**
  * @param {express.Application} app Application express
- * @param {Client} pgsql Base de données
+ * @param {Database} pgsql Base de données
  * @param {DiscordOauth2} oauth Discord Bot
  * @param {Discord.Client} discord
- * @param {TwitchApi} twitch
+ * @param {ApiClient} twitch
  * @param {f} functions
  * @param {String} dirname Nom du répertoire du serveur
  * @param {Map} cookies Liste des utilisateurs connectés et leurs cookies
@@ -22,7 +22,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
 
     const DISCORD_URL = oauth.generateAuthUrl({
         scope: SCOPE,
-        redirectUri: process.env.URL + "/connect",
+        redirectUri: "https://" + process.env.DOMAIN + "/connect",
         clientId: process.env.DISCORD_CLIENT_ID,
         prompt: "none",
         responseType: "code"
@@ -42,8 +42,8 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
         if (req.cookies.user && await functions.checkToken(req.cookies.user)) {
             try {
                 let guild = await discord.guilds.fetch(req.params.guild_id);
-                let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
-                if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
+                // let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
+                // if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
             } catch (err) {
                 console.error(err);
                 res.redirect("/dashboard");
@@ -110,11 +110,11 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     if (permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) {
                         try {
                             let guild = await discord.guilds.fetch(guild_partial.id);
-                            let query = await pgsql.query(`SELECT count(channelid) FROM twitch WHERE serverid='${guild.id}';`);
+                            let count = await pgsql.countAlertsByGuild(guild.id);
                             data.active.push({
                                 name: guild.name,
                                 id: guild.id,
-                                alerts: query.rows[0].count,
+                                alerts: count,
                                 icon: guild.icon ? "https://cdn.discordapp.com/icons/" + guild.id + "/" + guild.icon + ".png" : "/assets/img/icons/discord.png"
                             });
                         } catch (err) {
@@ -149,8 +149,8 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
             let guild;
             try {
                 guild = await discord.guilds.fetch(req.query.server);
-                let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
-                if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
+                // let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
+                // if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
             } catch (err) {
                 console.error(err);
                 res.sendStatus(401);
@@ -164,11 +164,9 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 icon: guild.icon ? "https://cdn.discordapp.com/icons/" + guild.id + "/" + guild.icon + ".png" : "/assets/img/icons/discord.png"
             }
 
-            let query = await pgsql.query(`SELECT * FROM twitch WHERE serverid='${guild.id}';`);
-            for (const i in query.rows) {
-                let alert = query.rows[i];
-                let users = await twitch.getUsers(alert.channelid);
-                let user = users.data[0];
+            const alerts = await pgsql.listAlertsByGuild(guild.id);
+            for (const alert of alerts) {
+                const user = await twitch.users.getUserById(alert.alert_streamer);
                 let channel;
                 try {
                     channel = await guild.channels.fetch(alert.canalid);
@@ -179,13 +177,13 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 }
 
                 data.alerts.push({
-                    icon: user.profile_image_url,
-                    name: user.display_name,
+                    icon: user.profilePictureUrl,
+                    name: user.displayName,
                     id: user.id,
                     channel_id: channel.id,
                     channel_name: channel.name,
-                    start: alert.messagelive,
-                    end: alert.messagefin
+                    start: alert.alert_start,
+                    end: alert.alert_end
                 });
             }
             data.alerts.sort((a, b) => {

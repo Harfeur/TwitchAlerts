@@ -1,5 +1,6 @@
 const {version, EmbedBuilder} = require("discord.js");
 const {DurationFormatter} = require("@sapphire/time-utilities");
+const {getString} = require("../modules/language");
 const durationFormatter = new DurationFormatter();
 
 module.exports = {
@@ -67,6 +68,50 @@ module.exports = {
                 },
             ])
             .setTimestamp();
+    },
+
+    generateLiveEmbed: (user, stream, lang) => {
+        const now = Date.now();
+        const debut = new Date(stream.started_at);
+
+        const heures = Math.trunc(((now - debut) / 60000) / 60);
+        const minutes = Math.trunc((now - debut) / 60000 - heures * 60);
+
+        return new EmbedBuilder()
+            .setColor(9442302)
+            .setTimestamp(new Date(stream.started_at))
+            .setTitle("🔴 " + getString(lang, "TITLE", {name: user.display_name}))
+            .setURL(`https://www.twitch.tv/${user.login}`)
+            .setThumbnail(user.profile_image_url)
+            .setImage(`https://static-cdn.jtvnw.net/ttv-boxart/${stream.game_name.split(" ").join("%20")}-272x380.jpg`)
+            .setFooter({
+                text: getString(lang, "START")
+            })
+            .setAuthor({
+                name: "Twitch",
+                url: `https://www.twitch.tv/${user.login}`,
+                icon_url: "https://cdn3.iconfinder.com/data/icons/social-messaging-ui-color-shapes-2-free/128/social-twitch-circle-512.png"
+            })
+            .setFields(
+                {
+                    name: getString(lang, "STATUS"),
+                    value: `❯ ${stream.title}`
+                },
+                {
+                    name: getString(lang, "GAME"),
+                    value: `❯ ${stream.game_name}`,
+                    inline: true
+                },
+                {
+                    name: getString(lang, "LENGTH"),
+                    value: "❯ " + getString(lang, "LENGTH_TIME", {hours: heures, minutes: minutes}),
+                    inline: true
+                },
+                {
+                    name: getString(lang, "VIEWERS"),
+                    value: `❯ ${stream.viewer_count}`,
+                    inline: true
+                });
     }
 
 }

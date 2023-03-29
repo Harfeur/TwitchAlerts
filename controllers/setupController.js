@@ -3,8 +3,14 @@ const logger = require("../modules/logger");
 
 module.exports = class SetupController {
     static async setup(client, interaction) {
-        if (!interaction.memberPermissions.has(PermissionsBitField.Flags.Administrator))
-            return await interaction.reply(interaction.getLocalizedString("NO_RIGHTS"));
+        if (!interaction.channel.permissionsFor(client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks, PermissionsBitField.Flags.ViewChannel])) {
+            logger.debug(`Missing bot permissions in channel ${interaction.channel.id} in guild ${interaction.guild.id}`);
+            if (!client.container.debug) await interaction.reply({
+                content: interaction.getLocalizedString("SETUP_NO_PERMISSIONS"),
+                ephemeral: true
+            });
+            return;
+        }
 
         const inputStreamer = new TextInputBuilder()
             .setCustomId("streamer")
@@ -37,30 +43,37 @@ module.exports = class SetupController {
             .setCustomId("setup_modal")
             .addComponents(row1, row2, row3);
 
-        await interaction.showModal(modal);
+        if (!client.container.debug) await interaction.showModal(modal);
+        logger.debug(`Setup modal sent to ${interaction.user.id} in ${interaction.guild.id}`);
     }
 
     static async modalSubmit(client, interaction) {
-        const twitchRes = await client.container.twitch.getUsers(interaction.fields.getTextInputValue("streamer"));
-        if (!twitchRes.data || twitchRes.data.length === 0) return await interaction.reply(interaction.getLocalizedString("SETUP_NO_RESULT"))
+        if (!client.container.debug) await interaction.deferReply({ephemeral: true});
 
-        let userId = twitchRes.data[0].id;
+        const user = await client.container.twitch.users.getUserByName(interaction.fields.getTextInputValue("streamer"));
+        if (!user) {
+            logger.debug(`Failed to retrieve streamer ${interaction.fields.getTextInputValue("streamer")}`);
+            if (!client.container.debug) await interaction.editReply(interaction.getLocalizedString("SETUP_NO_RESULT"));
+            return;
+        }
 
-        const query = await client.container.pg.query(`SELECT * FROM twitch WHERE channelid=${userId} AND serverid='${interaction.guild.id}';`);
-        if (query.rowCount !== 0) return await interaction.reply(interaction.getLocalizedString("SETUP_ALREADY"), {
-            command: interaction.getLocalizedString("DELETE_CMD_NAME")
-        });
+        const alert = await client.container.pg.getAlert(interaction.guild.id, user.id);
+        if (alert.length !== 0) {
+            logger.debug(`Streamer ${user.displayName} already existing in server ${interaction.guild.id}`);
+            if (!client.container.debug) await interaction.editReply(interaction.getLocalizedString("SETUP_ALREADY"), {
+                command: interaction.getLocalizedString("DELETE_CMD_NAME")
+            });
+            return;
+        }
 
-        if (!interaction.channel.permissionsFor(client.user).has([PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks, PermissionsBitField.Flags.ViewChannel]))
-            return await interaction.reply(interaction.getLocalizedString("SETUP_NO_PERMISSIONS"));
-
-        const channelID = interaction.channel.id;
         const messageLIVE = interaction.fields.getTextInputValue("start").replaceAll("'", "''");
         const messageFIN = interaction.fields.getTextInputValue("end").replaceAll("'", "''");
 
-        await client.container.pg.query(`INSERT INTO twitch(channelid, serverid, canalid, messagelive, messagefin) VALUES (${userId}, '${interaction.guild.id}', '${channelID}', '${messageLIVE}', '${messageFIN}');`);
-        await interaction.reply(interaction.getLocalizedString("SETUP_SUCCESS"));
+        if (!client.container.debug) {
+            await client.container.pg.addAlert(interaction.guild.id, user.id, interaction.channel.id, messageLIVE, messageFIN);
+            await interaction.editReply(interaction.getLocalizedString("SETUP_SUCCESS"));
+        }
 
-        logger.log("New alert added");
+        logger.debug(`New alert added for ${user.displayName} in guild ${interaction.guild.id}`);
     }
 }

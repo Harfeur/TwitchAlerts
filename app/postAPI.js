@@ -1,17 +1,17 @@
 const express = require('express');
-const {Client} = require('pg');
+const Database = require('../models/database');
 const DiscordOauth2 = require("discord-oauth2");
 const Discord = require('discord.js');
-const {default: TwitchApi} = require("node-twitch");
+const {ApiClient} = require("@twurple/api");
 const f = require("./functions");
 
 
 /**
  * @param {express.Application} app Application express
- * @param {Client} pgsql Base de données
+ * @param {Database} pgsql Base de données
  * @param {DiscordOauth2} oauth Discord Bot
  * @param {Discord.Client} discord
- * @param {TwitchApi} twitch
+ * @param {ApiClient} twitch
  * @param {f} functions
  * @param {String} dirname Nom du répertoire du serveur
  * @param {Map} cookies Liste des utilisateurs connectés et leurs cookies
@@ -31,13 +31,13 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     return;
                 }
                 try {
-                    let users = await twitch.getUsers(req.body.streamer_name);
-                    if (users.data.length !== 1) {
+                    const user = await twitch.users.getUserByName(req.body.streamer_name);
+                    if (!user) {
                         res.sendStatus(406);
                         return;
                     }
-                    await pgsql.query(`UPDATE twitch SET channelid=${users.data[0].id}, messagelive='${req.body.start.replaceAll("'", "''")}', messagefin='${req.body.end.replaceAll("'", "''")}' WHERE channelid=${req.body.streamer_id} AND serverid='${req.body.guild_id.replaceAll("'", "''")}'`);
-                    res.send(users.data[0]);
+                    await pgsql.editAlert(req.body.guild_id.replaceAll("'", "''"), req.body.streamer_id, user.id, req.body.start.replaceAll("'", "''"), req.body.end.replaceAll("'", "''"))
+                    res.send(user); // TODO : Update HTML/JS
                 } catch (err) {
                     if (err.code === "23505") res.sendStatus(409); else {
                         res.sendStatus(500);
@@ -81,7 +81,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 }
 
                 try {
-                    let query = await pgsql.query(`UPDATE twitch SET canalid='${channel.id}', messageid='0' WHERE channelid=${req.body.streamer_id} AND serverid='${req.body.guild_id.replaceAll("'", "''")}'`);
+                    await pgsql.moveAlert(req.body.guild_id.replaceAll("'", "''"), req.body.streamer_id, channel.id);
                     res.send({
                         channel_id: channel.id, channel_name: channel.name
                     });
@@ -127,17 +127,16 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 }
                 // Check twitch and upload
                 try {
-                    let users = await twitch.getUsers(req.body.streamer_name);
-                    if (users.data.length !== 1) {
+                    const user = await twitch.users.getUserByName(req.body.streamer_name);
+                    if (!user) {
                         res.sendStatus(406);
                         return;
                     }
-                    let user = users.data[0];
-                    await pgsql.query(`INSERT INTO twitch (channelid, serverid, canalid, messagelive, messagefin) VALUES (${user.id}, '${req.body.guild_id.replaceAll("'", "''")}', ${channel.id}, '${req.body.start.replaceAll("'", "''")}', '${req.body.end.replaceAll("'", "''")}');`);
+                    await pgsql.addAlert(req.body.guild_id.replaceAll("'", "''"), user.id, channel.id, req.body.start.replaceAll("'", "''"), req.body.end.replaceAll("'", "''"));
                     res.send({
                         alert: {
-                            icon: user.profile_image_url,
-                            name: user.display_name,
+                            icon: user.profilePictureUrl,
+                            name: user.displayName,
                             id: user.id,
                             channel_id: channel.id,
                             channel_name: channel.name,
@@ -175,7 +174,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     return;
                 }
                 try {
-                    await pgsql.query(`DELETE FROM twitch WHERE channelid=${req.body.streamer_id} AND serverid='${req.body.guild_id.replaceAll("'", "''")}'`);
+                    await pgsql.deleteAlert(req.body.guild_id.replaceAll("'", "''"), req.body.streamer_id);
                     res.send("Done");
                 } catch (err) {
                     if (err.code === "23505") res.sendStatus(409); else {

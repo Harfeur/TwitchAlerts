@@ -6,7 +6,7 @@ const buttonService = require("../models/buttonService");
 module.exports = class GeneralController {
     static async stats(client, interaction) {
         const statsEmbed = embedService.generateStatEmbed(client, interaction);
-        await interaction.reply({embeds: [statsEmbed]});
+        if (!client.container.debug) await interaction.reply({embeds: [statsEmbed]});
     }
 
     static async info(client, interaction) {
@@ -17,6 +17,6 @@ module.exports = class GeneralController {
                 buttonService.getLinkButton(interaction.getLocalizedString("INFO_INVITE"), "https://discord.com/oauth2/authorize?client_id=748846588163784794&scope=bot+applications.commands&permissions=216064"),
                 buttonService.getLinkButton(interaction.getLocalizedString("INFO_SUPPORT"), "https://discord.gg/uY98wtmvXf")
             )
-        await interaction.reply({embeds: [statsEmbed], components: [link]});
+        if (!client.container.debug) await interaction.reply({embeds: [statsEmbed], components: [link]});
     }
 }

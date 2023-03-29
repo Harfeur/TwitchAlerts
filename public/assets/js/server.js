@@ -34,14 +34,14 @@ function createAlert(alert, data) {
                     end: $("#end-edit").val()
                 }).done((res) => {
                     // Update variables
-                    alert.name = res.display_name;
+                    alert.name = res.displayName;
                     alert.start = $("#start-edit").val();
                     alert.end = $("#end-edit").val();
                     alert.id = res.id;
 
                     // Update alerts list
                     streamerName.text(alert.name);
-                    streamerIcon.attr("src", res.profile_image_url);
+                    streamerIcon.attr("src", res.profileImageUrl);
                     start.text(alert.start);
                     end.text(alert.end);
 

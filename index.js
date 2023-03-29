@@ -4,20 +4,25 @@
 if (Number(process.version.slice(1).split(".")[0]) < 16) throw new Error("Node 16.x or higher is required. Update Node on your system.");
 
 const {Client, Collection} = require("discord.js");
-const pgModule = require('pg');
-const TwitchApi = require('node-twitch').default;
+const Database = require('./models/database');
 
 const {readdirSync} = require("fs");
 const {intents, partials} = require("./config");
 const logger = require("./modules/logger");
 const {translateCommand} = require("./modules/language");
+const {AppTokenAuthProvider} = require("@twurple/auth");
+const {ApiClient} = require("@twurple/api");
+const {EventSubMiddleware} = require("@twurple/eventsub-http");
+const FetchLive = require("./services/fetchLive");
 
 const client = new Client({intents, partials});
 
 const slashcmds = new Collection();
 
 client.container = {
-    slashcmds
+    slashcmds,
+    debug: process.env.NODE_ENV !== "production",
+    pg: new Database(process.env.DATABASE_URL)
 };
 
 const init = async () => {
@@ -42,22 +47,22 @@ const init = async () => {
         client.on(eventName, event.bind(null, client));
     }
 
-    // Database
-    client.container.pg = new pgModule.Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false
-        }
-    })
-    client.container.pg.connect();
-
     // Twitch
-    client.container.twitch = new TwitchApi({
-        client_id: process.env.TWITCH_BOT_CLIENT_ID,
-        client_secret: process.env.TWITCH_BOT_CLIENT_SECRET
-    });
+    const authProvider = new AppTokenAuthProvider(process.env.TWITCH_BOT_CLIENT_ID, process.env.TWITCH_BOT_CLIENT_SECRET);
+    client.container.twitch = new ApiClient({authProvider});
 
-    client.login(process.env.TWITCHBOT);
+    await client.login(process.env.TWITCHBOT);
+
+    const middleware = new EventSubMiddleware({
+        apiClient: client.container.twitch,
+        hostName: 'twitchbot.harfeur.fr',
+        pathPrefix: '/twitch',
+        secret: process.env.MY_SECRET
+    });
+    const fl = new FetchLive(client, middleware);
+
+    await require('./web.js')(client.container.pg, client, client.container.twitch, fl);
+
 };
 
 init();

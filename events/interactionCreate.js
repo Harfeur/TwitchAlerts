@@ -12,16 +12,19 @@ module.exports = async (client, interaction) => {
 
     try {
         if (interaction.type === InteractionType.ApplicationCommand) {
-            logger.log(`${interaction.user.id} ran slash command ${interaction.commandName}`, "cmd");
+            logger.log(`${interaction.user.id} on server ${interaction.guild.id} ran slash command ${interaction.commandName}`, "cmd");
             await cmd.run(client, interaction);
-        } else if (interaction.isAnySelectMenu()) {
+        } else if (interaction.isStringSelectMenu()) {
+            logger.log(`${interaction.user.id} on server ${interaction.guild.id} ran string menu ${interaction.customId}`, "cmd");
             await cmd.selectMenu(client, interaction);
         } else if (interaction.isModalSubmit()) {
+            logger.log(`${interaction.user.id} on server ${interaction.guild.id} ran modal submit ${interaction.customId}`, "cmd");
             await cmd.modalSubmit(client, interaction);
         }
     } catch (e) {
         logger.error(e.message);
-        console.error(e)
+        console.error(e);
+        if (client.container.debug) return;
         if (interaction.replied)
             interaction.followUp({
                 content: `There was a problem with your request.\n\`\`\`${e.message}\`\`\``,
