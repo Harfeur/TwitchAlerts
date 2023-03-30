@@ -81,6 +81,8 @@
     "inputEndPlaceholder": "Der Stream ist zu Ende. Gucke die Wiederholung:",
     "inputChannel": "Textkanal",
     "inputChannelPlaceholder": "Name oder ID",
+    "inputGame": "Display game",
+    "inputViewers": "Display viewers count",
     "create": "Erstellen",
     "edit": "Bearbeiten",
     "move": "Verschieben",

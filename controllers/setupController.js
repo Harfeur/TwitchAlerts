@@ -70,7 +70,7 @@ module.exports = class SetupController {
         const messageFIN = interaction.fields.getTextInputValue("end").replaceAll("'", "''");
 
         if (!client.container.debug) {
-            await client.container.pg.addAlert(interaction.guild.id, user.id, interaction.channel.id, messageLIVE, messageFIN);
+            await client.container.pg.addAlert(interaction.guild.id, user.id, interaction.channel.id, messageLIVE, messageFIN, true, true);
             await interaction.editReply(interaction.getLocalizedString("SETUP_SUCCESS"));
         }
 

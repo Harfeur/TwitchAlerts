@@ -81,6 +81,8 @@
     "inputEndPlaceholder": "Vys\u00edl\u00e1n\u00ed je u konce. Z\u00e1znam zhl\u00e9dn\u011bte zde:",
     "inputChannel": "Textov\u00fd kan\u00e1l",
     "inputChannelPlaceholder": "N\u00e1zev nebo ID",
+    "inputGame": "Display game",
+    "inputViewers": "Display viewers count",
     "create": "Vytvo\u0159it",
     "edit": "Upravit",
     "move": "P\u0159esunout",

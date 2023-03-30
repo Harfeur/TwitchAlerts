@@ -1,7 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const DiscordOauth2 = require("discord-oauth2");
+const logger = require("./modules/logger");
 
 // Connexion à Discord
 const oauth = new DiscordOauth2({
@@ -17,8 +17,6 @@ async function init(pgsql, discord, twitch, middleware, fetchlive){
 
 // CONFIGURATION ==================================
     app.use(cookieParser());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended: true}));
 
     app.use('/', express.static('public'));
 
@@ -32,9 +30,9 @@ async function init(pgsql, discord, twitch, middleware, fetchlive){
     require('./app/postAPI.js')(app, pgsql, oauth, discord, twitch, functions, __dirname, cookies);
 
 // LAUNCH ========================================
-    app.listen(process.env.PORT, "twitchbot.harfeur.fr", async function () {
+    app.listen(process.env.PORT, async function () {
+        logger.log(`Serveur démarré sur le port ${process.env.PORT}`);
         await fetchlive.markAsReady();
-        console.log("Serveur démarré sur le port " + process.env.PORT);
     });
 
 }

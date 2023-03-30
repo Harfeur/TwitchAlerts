@@ -7,11 +7,13 @@ module.exports = async client => {
 
     const middleware = new EventSubMiddleware({
         apiClient: client.container.twitch,
-        hostName: 'twitchbot.harfeur.fr',
+        hostName: process.env.DOMAIN,
         pathPrefix: '/twitch',
-        secret: process.env.MY_SECRET
+        secret: process.env.MY_SECRET,
+        legacySecrets: false
     });
     const fl = new FetchLive(client, middleware);
+    client.container.pg.passFetchLive(fl);
 
-    await require('../web.js')(client.container.pg, client, client.container.twitch, fl);
+    await require('../web.js')(client.container.pg, client, client.container.twitch, middleware, fl);
 };

@@ -4,6 +4,8 @@ const DiscordOauth2 = require("discord-oauth2");
 const Discord = require('discord.js');
 const {ApiClient} = require("@twurple/api");
 const f = require("./functions");
+const bodyParser = require("body-parser");
+const logger = require("../modules/logger");
 
 
 /**
@@ -18,15 +20,17 @@ const f = require("./functions");
  */
 module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirname, cookies) {
 
-    app.post("/edit", async (req, res) => {
+    app.post("/edit", bodyParser.json(), bodyParser.urlencoded({extended: true}), async (req, res) => {
         if (req.cookies.user && await functions.checkToken(req.cookies.user)) {
-            if (req.body.guild_id && req.body.streamer_id && req.body.streamer_name && req.body.start && req.body.end && /^\d+$/.test(req.body.streamer_id)) {
+            if (req.body.guild_id && req.body.streamer_id && req.body.streamer_name && req.body.start && req.body.end && /^\d+$/.test(req.body.streamer_id) && req.body.display_game && req.body.display_viewers) {
+                req.body.display_game = (req.body.display_game === "true");
+                req.body.display_viewers = (req.body.display_viewers === "true");
                 try {
                     let guild = await discord.guilds.fetch(req.body.guild_id);
                     let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
                     if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
                 } catch (err) {
-                    console.error(err);
+                    logger.error(err);
                     res.sendStatus(401);
                     return;
                 }
@@ -36,12 +40,16 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                         res.sendStatus(406);
                         return;
                     }
-                    await pgsql.editAlert(req.body.guild_id.replaceAll("'", "''"), req.body.streamer_id, user.id, req.body.start.replaceAll("'", "''"), req.body.end.replaceAll("'", "''"))
-                    res.send(user); // TODO : Update HTML/JS
+                    await pgsql.editAlert(req.body.guild_id.replaceAll("'", "''"), req.body.streamer_id, user.id, req.body.start.replaceAll("'", "''"), req.body.end.replaceAll("'", "''"), req.body.display_game, req.body.display_viewers)
+                    res.send({
+                        id: user.id,
+                        displayName: user.displayName,
+                        profilePictureUrl: user.profilePictureUrl
+                    });
                 } catch (err) {
                     if (err.code === "23505") res.sendStatus(409); else {
                         res.sendStatus(500);
-                        console.error(err);
+                        logger.error(err);
                     }
                 }
             } else {
@@ -52,7 +60,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
         }
     });
 
-    app.post("/move", async (req, res) => {
+    app.post("/move", bodyParser.json(), bodyParser.urlencoded({extended: true}), async (req, res) => {
         if (req.cookies.user && await functions.checkToken(req.cookies.user)) {
             if (req.body.guild_id && req.body.streamer_id && req.body.channel && /^\d+$/.test(req.body.streamer_id)) {
                 let guild;
@@ -61,7 +69,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
                     if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
                 } catch (err) {
-                    console.error(err);
+                    logger.error(err);
                     res.sendStatus(401);
                     return;
                 }
@@ -87,7 +95,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     });
                 } catch (err) {
                     res.sendStatus(500);
-                    console.error(err);
+                    logger.error(err);
                 }
             } else {
                 res.sendStatus(400);
@@ -97,9 +105,11 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
         }
     })
 
-    app.post("/create", async (req, res) => {
+    app.post("/create", bodyParser.json(), bodyParser.urlencoded({extended: true}), async (req, res) => {
         if (req.cookies.user && await functions.checkToken(req.cookies.user)) {
-            if (req.body.guild_id && req.body.streamer_name && req.body.start && req.body.end && req.body.channel) {
+            if (req.body.guild_id && req.body.streamer_name && req.body.start && req.body.end && req.body.channel && req.body.display_game && req.body.display_viewers) {
+                req.body.display_game = (req.body.display_game === "true");
+                req.body.display_viewers = (req.body.display_viewers === "true");
                 // Check rights
                 let guild;
                 try {
@@ -107,7 +117,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
                     if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
                 } catch (err) {
-                    console.error(err);
+                    logger.error(err);
                     res.sendStatus(401);
                     return;
                 }
@@ -132,7 +142,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                         res.sendStatus(406);
                         return;
                     }
-                    await pgsql.addAlert(req.body.guild_id.replaceAll("'", "''"), user.id, channel.id, req.body.start.replaceAll("'", "''"), req.body.end.replaceAll("'", "''"));
+                    await pgsql.addAlert(req.body.guild_id.replaceAll("'", "''"), user.id, channel.id, req.body.start.replaceAll("'", "''"), req.body.end.replaceAll("'", "''"), req.body.display_game, req.body.display_viewers);
                     res.send({
                         alert: {
                             icon: user.profilePictureUrl,
@@ -141,7 +151,9 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                             channel_id: channel.id,
                             channel_name: channel.name,
                             start: req.body.start,
-                            end: req.body.end
+                            end: req.body.end,
+                            display_game: req.body.display_game,
+                            display_viewers: req.body.display_viewers
                         },
                         guild_id: guild.id,
                         guild_name: guild.name,
@@ -150,7 +162,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 } catch (err) {
                     if (err.code === "23505") res.sendStatus(409); else {
                         res.sendStatus(500);
-                        console.error(err);
+                        logger.error(err);
                     }
                 }
             } else {
@@ -161,7 +173,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
         }
     });
 
-    app.post("/delete", async (req, res) => {
+    app.post("/delete", bodyParser.json(), bodyParser.urlencoded({extended: true}), async (req, res) => {
         if (req.cookies.user && await functions.checkToken(req.cookies.user)) {
             if (req.body.guild_id && req.body.streamer_id && /^\d+$/.test(req.body.streamer_id)) {
                 try {
@@ -169,7 +181,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     let member = await guild.members.fetch(cookies.get(req.cookies.user).id);
                     if (!member.permissions.has(Discord.PermissionsBitField.Flags.ManageGuild)) throw new Error("Permissions insuffisantes pour l'utilisateur");
                 } catch (err) {
-                    console.error(err);
+                    logger.error(err);
                     res.sendStatus(401);
                     return;
                 }
@@ -179,7 +191,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 } catch (err) {
                     if (err.code === "23505") res.sendStatus(409); else {
                         res.sendStatus(500);
-                        console.error(err);
+                        logger.error(err);
                     }
                 }
             } else {

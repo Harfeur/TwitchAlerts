@@ -1,4 +1,4 @@
-const {ActionRowBuilder, SelectMenuBuilder, PermissionsBitField, StringSelectMenuBuilder} = require("discord.js");
+const {ActionRowBuilder, StringSelectMenuBuilder} = require("discord.js");
 const logger = require("../modules/logger");
 
 module.exports = class DeleteController {
@@ -22,7 +22,7 @@ module.exports = class DeleteController {
 
         for (let i = 0; i < alerts.rowCount && i < 25; i++) {
             let q = alerts.rows[i];
-            let user = await client.container.twitch.users.getUserById(q.alert_streamer);
+            let user = await client.container.twitch.users.getUserById(q.streamer_id);
             menu.addOptions([{
                 label: user.displayName,
                 value: user.id,

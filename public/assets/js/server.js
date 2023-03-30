@@ -22,6 +22,9 @@ function createAlert(alert, data) {
             $("#streamer-edit").val(alert.name);
             $("#start-edit").val(alert.start);
             $("#end-edit").val(alert.end);
+            console.log(alert.display_game);
+            $("#display-game-edit").prop('checked', alert.display_game);
+            $("#display-viewers-edit").prop('checked', alert.display_viewers);
             $("#form-edit").on("submit", function (e) {
                 e.preventDefault();
                 $("#form-edit [type='submit']").attr("disabled", "");
@@ -31,17 +34,21 @@ function createAlert(alert, data) {
                     streamer_id: alert.id,
                     streamer_name: $("#streamer-edit").val(),
                     start: $("#start-edit").val(),
-                    end: $("#end-edit").val()
+                    end: $("#end-edit").val(),
+                    display_game: $('#display-game-edit').is(':checked'),
+                    display_viewers: $('#display-viewers-edit').is(':checked'),
                 }).done((res) => {
                     // Update variables
                     alert.name = res.displayName;
                     alert.start = $("#start-edit").val();
                     alert.end = $("#end-edit").val();
                     alert.id = res.id;
+                    alert.display_game = $('#display-game-edit').is(':checked');
+                    alert.display_viewers = $('#display-viewers-edit').is(':checked')
 
                     // Update alerts list
                     streamerName.text(alert.name);
-                    streamerIcon.attr("src", res.profileImageUrl);
+                    streamerIcon.attr("src", res.profilePictureUrl);
                     start.text(alert.start);
                     end.text(alert.end);
 
@@ -131,6 +138,8 @@ function createAlert(alert, data) {
             $("#start-duplicate").val(alert.start);
             $("#end-duplicate").val(alert.end);
             $("#channel-duplicate").val(alert.channel_id);
+            $("#display-game-duplicate").prop('checked', alert.display_game);
+            $("#display-viewers-duplicate").prop('checked', alert.display_viewers);
             $("#form-duplicate").on("submit", function (e) {
                 e.preventDefault();
                 $("#form-duplicate [type='submit']").attr("disabled", "");
@@ -140,7 +149,9 @@ function createAlert(alert, data) {
                     streamer_name: $("#streamer-duplicate").val(),
                     start: $("#start-duplicate").val(),
                     end: $("#end-duplicate").val(),
-                    channel: $("#channel-duplicate").val()
+                    channel: $("#channel-duplicate").val(),
+                    display_game: $('#display-game-duplicate').is(':checked'),
+                    display_viewers: $('#display-viewers-duplicate').is(':checked')
                 }).done((res) => {
                     // Update alerts list
                     createAlert(res.alert, res);
@@ -248,7 +259,9 @@ $(() => {
                     streamer_name: $("#streamer-create").val(),
                     start: $("#start-create").val(),
                     end: $("#end-create").val(),
-                    channel: $("#channel-create").val()
+                    channel: $("#channel-create").val(),
+                    display_game: $('#display-game-create').is(':checked'),
+                    display_viewers: $('#display-viewers-create').is(':checked'),
                 }).done((res) => {
                     // Update alerts list
                     createAlert(res.alert, res);

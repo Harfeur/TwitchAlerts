@@ -81,6 +81,8 @@
     "inputEndPlaceholder": "The stream is finished. Watch the replay:",
     "inputChannel": "Text channel",
     "inputChannelPlaceholder": "Name or ID",
+    "inputGame": "Display game",
+    "inputViewers": "Display viewers count",
     "create": "Create",
     "edit": "Modify",
     "move": "Move",

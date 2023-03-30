@@ -81,6 +81,8 @@
     "inputEndPlaceholder": "De stream is voorbij, kijk hier naar de herhaling:",
     "inputChannel": "Tekst kanaal",
     "inputChannelPlaceholder": "Naam of ID",
+    "inputGame": "Display game",
+    "inputViewers": "Display viewers count",
     "create": "Cre\u00eber",
     "edit": "Aanpassen",
     "move": "Verplaats",

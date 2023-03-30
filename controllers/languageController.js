@@ -1,5 +1,4 @@
 const {getString} = require("../modules/language");
-const {PermissionsBitField} = require("discord.js");
 const logger = require("../modules/logger");
 module.exports = class LanguageController {
     static async language(client, interaction) {
@@ -8,7 +7,7 @@ module.exports = class LanguageController {
         const newLang = interaction.options.getString("value");
         if (!client.container.debug) {
             await client.container.pg.setGuildLanguage(interaction.guild.id, newLang);
-            await interaction.reply(interaction.getLocalizedString("LANGUAGE_UPDATE", {
+            await interaction.editReply(interaction.getLocalizedString("LANGUAGE_UPDATE", {
                 language: `**${newLang === "default" ? interaction.getLocalizedString("LANGUAGE_DEFAULT") : getString(newLang, "LANGUAGE")}**`
             }));
         }

@@ -81,6 +81,8 @@
     "inputEndPlaceholder": "Le stream est termin\u00e9. Regardez le replay :",
     "inputChannel": "Canal texte",
     "inputChannelPlaceholder": "Nom ou identifiant",
+    "inputGame": "Afficher le jeu",
+    "inputViewers": "Afficher le nombre de spectateurs",
     "create": "Cr\u00e9er",
     "edit": "Modifier",
     "move": "D\u00e9placer",
