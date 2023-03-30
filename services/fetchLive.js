@@ -126,8 +126,8 @@ class FetchLive {
         }
     }
 
-    async showStreamOnlineMessage(alert, stream, channel, lang) {
-        const user = await stream.getUser();
+    async showStreamOnlineMessage(alert, stream, channel, user, lang) {
+        if (!user) user = await stream.getUser();
         const game = await stream.getGame();
 
         const embed = await generateLiveEmbed(user, stream, game, alert, lang)
@@ -199,13 +199,13 @@ class FetchLive {
                 }).catch(logger.error);
     }
 
-    async updateAlert(alert, stream) {
+    async updateAlert(alert, stream, user=null) {
         // Fetch server
         let guild;
         try {
             guild = await this.client.guilds.fetch(alert.guild_id);
         } catch (e) {
-            logger.debug(`Guild ${alert.guild_id} not found`);
+            if (this.client.container.debug) logger.debug(`Guild ${alert.guild_id} not found`);
             return;
         }
         if (!guild.available) return;
@@ -215,7 +215,7 @@ class FetchLive {
         try {
             channel = await guild.channels.fetch(alert.alert_channel);
         } catch (e) {
-            logger.debug(`Channel ${alert.alert_channel} not found`);
+            if (this.client.container.debug) logger.debug(`Channel ${alert.alert_channel} not found`);
             return;
         }
         if (!channel.permissionsFor(this.client.user).has([
@@ -223,14 +223,14 @@ class FetchLive {
             PermissionsBitField.Flags.EmbedLinks,
             PermissionsBitField.Flags.ViewChannel
         ])) {
-            logger.debug(`Channel ${alert.alert_channel} missing permissions`);
+            if (this.client.container.debug) logger.debug(`Channel ${alert.alert_channel} missing permissions`);
             return;
         }
 
         const lang = alert.guild_language !== "default" ? alert.guild_language : guild.preferredLocale;
 
         if (stream) {
-            await this.showStreamOnlineMessage(alert, stream, channel, lang);
+            await this.showStreamOnlineMessage(alert, stream, channel, user, lang);
         } else {
             await this.showStreamOfflineMessage(alert, channel, lang);
         }
@@ -249,10 +249,13 @@ class FetchLive {
         for (const alertGroup of alertsBy100) {
             const ids = alertGroup.map(a => a.streamer_id);
             const streams = await this.client.container.twitch.streams.getStreamsByUserIds(ids);
-            for (const alert of alertGroup) {
-                let stream = streams.filter(stream => stream.userId === alert.streamer_id)[0];
+            const users = await this.client.container.twitch.users.getUsersByIds(ids);
 
-                await this.updateAlert(alert, stream)
+            for (const alert of alertGroup) {
+                const stream = streams.filter(stream => stream.userId === alert.streamer_id)[0];
+                const user = users.filter(user => user.id === alert.streamer_id)[0];
+
+                await this.updateAlert(alert, stream, user);
             }
         }
         logger.debug(`Fetching live for ${nbAlerts} alerts ... done !`);
