@@ -239,7 +239,8 @@ class FetchLive {
     async fetchLive() {
         let alerts = await this.client.container.pg.listAllAlerts();
         alerts = alerts.filter(alert => alert.streamer_live);
-        logger.debug(`Fetching live for ${alerts.length} alerts ...`);
+        const nbAlerts = alerts.length;
+        logger.debug(`Fetching live for ${nbAlerts} alerts ...`);
         const alertsBy100 = [];
         while (alerts.length) {
             alertsBy100.push(alerts.splice(0, 100));
@@ -254,7 +255,7 @@ class FetchLive {
                 await this.updateAlert(alert, stream)
             }
         }
-        logger.debug(`Fetching live for ${alerts.length} alerts ... done !`);
+        logger.debug(`Fetching live for ${nbAlerts} alerts ... done !`);
     }
 }
 
