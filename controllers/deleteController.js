@@ -20,13 +20,13 @@ module.exports = class DeleteController {
             .setCustomId("delete_select")
             .setPlaceholder(interaction.getLocalizedString("DELETE_CHOOSE_PLACEHOLDER"));
 
-        for (let i = 0; i < alerts.rowCount && i < 25; i++) {
-            let q = alerts.rows[i];
+        for (let i = 0; i < alerts.length && i < 25; i++) {
+            let q = alerts[i];
             let user = await client.container.twitch.users.getUserById(q.streamer_id);
             menu.addOptions([{
                 label: user.displayName,
                 value: user.id,
-                description: guild.channels.resolve(q.canalid)?.name ?? interaction.getLocalizedString("DELETE_CHANNEL_NOT_FOUND", {canalid: q.canalid})
+                description: guild.channels.resolve(q.alert_channel)?.name ?? interaction.getLocalizedString("DELETE_CHANNEL_NOT_FOUND", {canalid: q.alert_channel})
             }]);
         }
 
