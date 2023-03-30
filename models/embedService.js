@@ -95,7 +95,7 @@ module.exports = {
                 name: getString(lang, "STATUS"),
                 value: `❯ ${stream.title}`
             });
-        if (game && !alert.alert_pref_display_game)
+        if (game && alert.alert_pref_display_game)
             embed.setImage(game.getBoxArtUrl(272, 380))
                 .addFields({
                     name: getString(lang, "GAME"),
@@ -107,7 +107,7 @@ module.exports = {
             value: "❯ " + getString(lang, "LENGTH_TIME", {hours: heures, minutes: minutes}),
             inline: true
         });
-        if (!alert.alert_pref_display_viewers)
+        if (alert.alert_pref_display_viewers)
             embed.addFields({
                 name: getString(lang, "VIEWERS"),
                 value: `❯ ${stream.viewers}`,
