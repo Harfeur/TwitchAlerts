@@ -148,11 +148,9 @@ class FetchLive {
                     }).catch(logger.error);
                 })
                 .catch(err => {
-                    logger.error(`Can't find message ${alert.alert_message} in channel ${channel.id}`)
+                    logger.debug(`Can't find message ${alert.alert_message} in channel ${channel.id}`)
                     if (err.code === 10008) {
                         this.client.container.pg.removeAlertMessage(alert.guild_id, alert.streamer_id);
-                    } else {
-                        logger.error(err);
                     }
                 })
         }
