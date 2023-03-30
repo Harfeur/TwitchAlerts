@@ -145,7 +145,7 @@ class FetchLive {
                     message.edit({
                         content: `${alert.alert_start}\n<https://www.twitch.tv/${user.name}>`,
                         embeds: [embed]
-                    });
+                    }).catch(logger.error);
                 })
                 .catch(err => {
                     logger.error(`Can't find message ${alert.alert_message} in channel ${channel.id}`)
