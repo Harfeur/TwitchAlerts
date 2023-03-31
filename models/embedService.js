@@ -46,7 +46,7 @@ module.exports = {
         return new EmbedBuilder()
             .setTitle(interaction.getLocalizedString("INFO_TITLE"))
             .setURL("https://twitchbot.harfeur.fr")
-            .setDescription(interaction.getLocalizedString("INFO_DESCRIPTION", {setup: interaction.getLocalizedString("SETUP_CMD_NAME")}))
+            .setDescription(interaction.getLocalizedString("INFO_DESCRIPTION", {setup: `</info:${client.application.commands.cache.find(c => c.name==="info").id}>`}))
             .setColor('#e603f8')
             .setThumbnail(client.user.avatarURL())
             .addFields([
@@ -60,7 +60,7 @@ module.exports = {
                 },
                 {
                     name: interaction.getLocalizedString("INFO_LANGUAGE"),
-                    value: interaction.getLocalizedString("INFO_LANGUAGE_DESC", {language: interaction.getLocalizedString("LANGUAGE_CMD_NAME")})
+                    value: interaction.getLocalizedString("INFO_LANGUAGE_DESC", {language: `</language:${client.application.commands.cache.find(c => c.name==="language").id}>`})
                 },
                 {
                     name: interaction.getLocalizedString("INFO_TRANSLATE"),

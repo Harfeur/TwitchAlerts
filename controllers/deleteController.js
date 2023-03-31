@@ -11,7 +11,7 @@ module.exports = class DeleteController {
         if (alerts.length === 0) {
             logger.debug(`No alerts for guild ${interaction.guild.id}`);
             if (!client.container.debug) await interaction.editReply(interaction.getLocalizedString("DELETE_EMPTY", {
-                command: interaction.getLocalizedString("SETUP_CMD_NAME")
+                command: `</setup:${client.application.commands.cache.find(c => c.name==="setup").id}>`
             }));
             return;
         }
