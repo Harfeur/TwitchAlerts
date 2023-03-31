@@ -60,9 +60,9 @@ module.exports = class SetupController {
         const alert = await client.container.pg.getAlert(interaction.guild.id, user.id);
         if (alert.length !== 0) {
             logger.debug(`Streamer ${user.displayName} already existing in server ${interaction.guild.id}`);
-            if (!client.container.debug) await interaction.editReply(interaction.getLocalizedString("SETUP_ALREADY"), {
+            if (!client.container.debug) await interaction.editReply(interaction.getLocalizedString("SETUP_ALREADY", {
                 command: `</delete:${client.application.commands.cache.find(c => c.name==="delete").id}>`
-            });
+            }));
             return;
         }
 
