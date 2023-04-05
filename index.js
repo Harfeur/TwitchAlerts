@@ -12,10 +12,8 @@ const logger = require("./modules/logger");
 const {translateCommand} = require("./modules/language");
 const {AppTokenAuthProvider} = require("@twurple/auth");
 const {ApiClient} = require("@twurple/api");
-const {EventSubMiddleware} = require("@twurple/eventsub-http");
-const FetchLive = require("./services/fetchLive");
 
-const client = new Client({intents, partials});
+const client = new Client({intents, partials, shards:'auto'});
 
 const slashcmds = new Collection();
 
