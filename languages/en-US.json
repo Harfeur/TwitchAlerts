@@ -34,7 +34,7 @@
     "SETUP_NO_RESULT": "No result. Are you sure you typed the username correctly ?",
     "SETUP_ALREADY": "There is already an alert with this user. You can delete it with {command}",
     "SETUP_NO_PERMISSIONS": "I don't have permission to send a text message in this channel... Please verify the permissions, and retry.",
-    "SETUP_SUCCESS": "Succes ! Alerts will come when the next stream will start, or soon if it is already launched.",
+    "SETUP_SUCCESS": "Success! Alerts will come when the next stream will start, or soon if it is already launched.",
     "DELETE_EMPTY": "No alert have been setup. Start with {command}",
     "DELETE_CHOOSE_TITLE": "Please choose an alert to delete",
     "DELETE_CHOOSE_PLACEHOLDER": "Choose an alert to delete",
