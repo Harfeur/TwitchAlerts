@@ -1,7 +1,6 @@
 const {EmbedBuilder, PermissionsBitField} = require("discord.js");
 const {getString} = require("../modules/language");
 const logger = require("../modules/logger");
-const {EventSubMiddleware} = require("@twurple/eventsub-http");
 const {generateLiveEmbed} = require("../models/embedService");
 
 class FetchLive {
@@ -9,7 +8,7 @@ class FetchLive {
     /**
      *
      * @param client
-     * @param webhooks {EventSubMiddleware[]}
+     * @param webhooks {EventSubHttpListener[]}
      */
     constructor(client, webhooks) {
         this.client = client;
@@ -23,10 +22,6 @@ class FetchLive {
     async markAsReady() {
         if (this.ready) return;
         this.ready = true;
-
-        for (const webhook of this.webhooks) {
-            webhook.markAsReady();
-        }
 
         const alerts = await this.client.container.pg.listAllAlerts();
         for (const alert of alerts) {
@@ -68,8 +63,8 @@ class FetchLive {
     streamerAdded(streamer) {
         if (!this.subscriptions.has(streamer)) {
             logger.debug(`Subscriptions on for ${streamer}`)
-            let webhookID = this.subscriptions.size / 2000;
-            if (webhookID > parseInt(process.env.WEBHOOK_CLIENTS)) {
+            let webhookID = Math.floor(this.subscriptions.size / 2000);
+            if (webhookID >= parseInt(process.env.WEBHOOK_CLIENTS)) {
                 webhookID = parseInt(process.env.WEBHOOK_CLIENTS) - 1;
                 logger.warn("You need to add more webhooks clients !!");
             }

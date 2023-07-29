@@ -10,7 +10,7 @@ const oauth = new DiscordOauth2({
     redirectUri: "https://" + process.env.DOMAIN + "/connect"
 });
 
-async function init(pgsql, discord, twitch, webhooks, fetchlive){
+async function init(pgsql, discord, twitch, fetchLive){
     let cookies = new Map();
 
     const app = express();
@@ -19,10 +19,6 @@ async function init(pgsql, discord, twitch, webhooks, fetchlive){
     app.use(cookieParser());
 
     app.use('/', express.static('public'));
-
-    for (const webhook of webhooks) {
-        webhook.apply(app);
-    }
 
 // ROUTES =========================================
 
@@ -33,10 +29,9 @@ async function init(pgsql, discord, twitch, webhooks, fetchlive){
 
 // LAUNCH ========================================
     app.listen(process.env.PORT, async function () {
-        logger.log(`Serveur démarré sur le port ${process.env.PORT}`);
-        await fetchlive.markAsReady();
+        logger.log(`Server started on port ${process.env.PORT}`);
+        await fetchLive.markAsReady();
     });
-
 }
 
 module.exports = init;

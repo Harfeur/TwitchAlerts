@@ -1,6 +1,6 @@
 const logger = require("../modules/logger.js");
 const FetchLive = require('../services/fetchLive');
-const {EventSubMiddleware} = require("@twurple/eventsub-http");
+const {ReverseProxyAdapter, EventSubHttpListener} = require("@twurple/eventsub-http");
 const {AppTokenAuthProvider} = require("@twurple/auth");
 const {ApiClient} = require("@twurple/api");
 
@@ -13,10 +13,12 @@ module.exports = async client => {
     for (let i = 0; i < parseInt(process.env.WEBHOOK_CLIENTS); i++) {
         const authProvider = new AppTokenAuthProvider(process.env[`WEBHOOK_CLIENT_${i}`], process.env[`WEBHOOK_SECRET_${i}`])
         const apiClient = new ApiClient({authProvider});
-        const webhookMiddleware = new EventSubMiddleware({
+        const webhookMiddleware = new EventSubHttpListener({
             apiClient: apiClient,
-            hostName: process.env.DOMAIN,
-            pathPrefix: '/twitch',
+            adapter: new ReverseProxyAdapter({
+                hostName: `webhook${i}.${process.env.DOMAIN}`,
+                port: process.env.PORT + i + 1,
+            }),
             secret: process.env[`WEBHOOK_SECRET_${i}`],
             legacySecrets: false
         });
@@ -31,5 +33,5 @@ module.exports = async client => {
     const fl = new FetchLive(client, webhooks);
     client.container.pg.passFetchLive(fl);
 
-    await require('../web.js')(client.container.pg, client, client.container.twitch, webhooks, fl);
+    await require('../web.js')(client.container.pg, client, client.container.twitch, fl);
 };
