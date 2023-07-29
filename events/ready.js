@@ -1,21 +1,35 @@
 const logger = require("../modules/logger.js");
 const FetchLive = require('../services/fetchLive');
 const {EventSubMiddleware} = require("@twurple/eventsub-http");
+const {AppTokenAuthProvider} = require("@twurple/auth");
+const {ApiClient} = require("@twurple/api");
 
 module.exports = async client => {
     logger.log(`${client.user.tag}, ready to serve ${client.guilds.cache.map(g => g.memberCount).reduce((a, b) => a + b)} users in ${client.guilds.cache.size} servers.`, "ready");
     await client.application.fetch();
     await client.application.commands.fetch();
 
-    const middleware = new EventSubMiddleware({
-        apiClient: client.container.twitch,
-        hostName: process.env.DOMAIN,
-        pathPrefix: '/twitch',
-        secret: process.env.MY_SECRET,
-        legacySecrets: false
-    });
-    const fl = new FetchLive(client, middleware);
+    let webhooks = [];
+    for (let i = 0; i < parseInt(process.env.WEBHOOK_CLIENTS); i++) {
+        const authProvider = new AppTokenAuthProvider(process.env[`WEBHOOK_CLIENT_${i}`], process.env[`WEBHOOK_SECRET_${i}`])
+        const apiClient = new ApiClient({authProvider});
+        const webhookMiddleware = new EventSubMiddleware({
+            apiClient: apiClient,
+            hostName: process.env.DOMAIN,
+            pathPrefix: '/twitch',
+            secret: process.env[`WEBHOOK_SECRET_${i}`],
+            legacySecrets: false
+        });
+        webhooks.push(webhookMiddleware);
+        webhookMiddleware.onSubscriptionCreateFailure((sub, err) => {
+            logger.error(err);
+        });
+        webhookMiddleware.onRevoke(sub => {
+            logger.error("Revocation");
+        });
+    }
+    const fl = new FetchLive(client, webhooks);
     client.container.pg.passFetchLive(fl);
 
-    await require('../web.js')(client.container.pg, client, client.container.twitch, middleware, fl);
+    await require('../web.js')(client.container.pg, client, client.container.twitch, webhooks, fl);
 };

@@ -9,52 +9,28 @@ class FetchLive {
     /**
      *
      * @param client
-     * @param middleware {EventSubMiddleware}
+     * @param webhooks {EventSubMiddleware[]}
      */
-    constructor(client, middleware) {
+    constructor(client, webhooks) {
         this.client = client;
 
-        this.eventsub = middleware;
+        this.webhooks = webhooks;
         this.ready = false;
 
         this.subscriptions = new Map();
-
-        this.eventsub.onSubscriptionCreateFailure((sub, err) => {
-            logger.error(err);
-        });
-        this.eventsub.onRevoke(sub => {
-            logger.error("Revocation");
-        });
     }
 
     async markAsReady() {
         if (this.ready) return;
         this.ready = true;
 
-        await this.eventsub.markAsReady();
+        for (const webhook of this.webhooks) {
+            webhook.markAsReady();
+        }
 
         const alerts = await this.client.container.pg.listAllAlerts();
         for (const alert of alerts) {
-            if (!this.subscriptions.has(alert.streamer_id)) {
-                const ev1 = this.eventsub.onStreamOnline(alert.streamer_id, async event => {
-                    await this.client.container.pg.streamOnline(event.broadcasterId);
-                    const alerts = await this.client.container.pg.listAlertsByStreamer(event.broadcasterId);
-                    const stream = await event.getStream();
-
-                    for (const alert of alerts) {
-                        await this.updateAlert(alert, stream);
-                    }
-                });
-                const ev2 = this.eventsub.onStreamOffline(alert.streamer_id, async event => {
-                    await this.client.container.pg.streamOffline(event.broadcasterId);
-                    const alerts = await this.client.container.pg.listAlertsByStreamer(event.broadcasterId);
-
-                    for (const alert of alerts) {
-                        await this.updateAlert(alert, null);
-                    }
-                });
-                this.subscriptions.set(alert.streamer_id, [ev1, ev2]);
-            }
+            this.streamerAdded(alert.streamer_id);
         }
         logger.log("Subscriptions are ready", "ready");
         await this.checkCurrentStreams();
@@ -92,7 +68,13 @@ class FetchLive {
     streamerAdded(streamer) {
         if (!this.subscriptions.has(streamer)) {
             logger.debug(`Subscriptions on for ${streamer}`)
-            const ev1 = this.eventsub.onStreamOnline(streamer, async event => {
+            let webhookID = this.subscriptions.size / 2000;
+            if (webhookID > parseInt(process.env.WEBHOOK_CLIENTS)) {
+                webhookID = parseInt(process.env.WEBHOOK_CLIENTS) - 1;
+                logger.warn("You need to add more webhooks clients !!");
+            }
+            const webhook = this.webhooks[webhookID] // Max 2500 streamers per webhook
+            const ev1 = webhook.onStreamOnline(streamer, async event => {
                 await this.client.container.pg.streamOnline(event.broadcasterId);
                 const alerts = await this.client.container.pg.listAlertsByStreamer(event.broadcasterId);
                 const stream = await event.getStream();
@@ -101,7 +83,7 @@ class FetchLive {
                     await this.updateAlert(alert, stream);
                 }
             });
-            const ev2 = this.eventsub.onStreamOffline(streamer, async event => {
+            const ev2 = webhook.onStreamOffline(streamer, async event => {
                 await this.client.container.pg.streamOffline(event.broadcasterId);
                 const alerts = await this.client.container.pg.listAlertsByStreamer(event.broadcasterId);
 
@@ -109,7 +91,7 @@ class FetchLive {
                     await this.updateAlert(alert, null);
                 }
             });
-            this.subscriptions.set(streamer, [ev1, ev2]);
+            this.subscriptions.set(streamer, [webhook, ev1, ev2]);
         }
     }
 
@@ -119,8 +101,8 @@ class FetchLive {
             if (alerts.length === 0) {
                 logger.debug(`Subscriptions off for ${streamer}`)
                 const sub = this.subscriptions.get(streamer);
-                sub[0].stop();
                 sub[1].stop();
+                sub[2].stop();
                 this.subscriptions.delete(streamer);
             }
         }

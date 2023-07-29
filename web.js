@@ -10,7 +10,7 @@ const oauth = new DiscordOauth2({
     redirectUri: "https://" + process.env.DOMAIN + "/connect"
 });
 
-async function init(pgsql, discord, twitch, middleware, fetchlive){
+async function init(pgsql, discord, twitch, webhooks, fetchlive){
     let cookies = new Map();
 
     const app = express();
@@ -20,7 +20,9 @@ async function init(pgsql, discord, twitch, middleware, fetchlive){
 
     app.use('/', express.static('public'));
 
-    middleware.apply(app);
+    for (const webhook of webhooks) {
+        webhook.apply(app);
+    }
 
 // ROUTES =========================================
 
