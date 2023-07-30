@@ -62,13 +62,12 @@ class FetchLive {
 
     streamerAdded(streamer) {
         if (!this.subscriptions.has(streamer)) {
-            logger.debug(`Subscriptions on for ${streamer}`)
             let webhookID = Math.floor(this.subscriptions.size / 2000);
             if (webhookID >= parseInt(process.env.WEBHOOK_CLIENTS)) {
                 webhookID = parseInt(process.env.WEBHOOK_CLIENTS) - 1;
                 logger.warn("You need to add more webhooks clients !!");
             }
-            const webhook = this.webhooks[webhookID] // Max 2500 streamers per webhook
+            const webhook = this.webhooks[webhookID] // Max 5000 streamers per webhook
             const ev1 = webhook.onStreamOnline(streamer, async event => {
                 await this.client.container.pg.streamOnline(event.broadcasterId);
                 const alerts = await this.client.container.pg.listAlertsByStreamer(event.broadcasterId);
@@ -78,6 +77,7 @@ class FetchLive {
                     await this.updateAlert(alert, stream);
                 }
             });
+
             const ev2 = webhook.onStreamOffline(streamer, async event => {
                 await this.client.container.pg.streamOffline(event.broadcasterId);
                 const alerts = await this.client.container.pg.listAlertsByStreamer(event.broadcasterId);
@@ -86,6 +86,8 @@ class FetchLive {
                     await this.updateAlert(alert, null);
                 }
             });
+
+            logger.debug(`Subscriptions on for ${streamer} on webhook${webhookID}`);
             this.subscriptions.set(streamer, [webhook, ev1, ev2]);
         }
     }

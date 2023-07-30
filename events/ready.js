@@ -14,14 +14,14 @@ module.exports = async client => {
         const authProvider = new AppTokenAuthProvider(process.env[`WEBHOOK_CLIENT_${i}`], process.env[`WEBHOOK_SECRET_${i}`])
         const apiClient = new ApiClient({authProvider});
         const webhookMiddleware = new EventSubHttpListener({
-            apiClient: apiClient,
+            apiClient,
             adapter: new ReverseProxyAdapter({
                 hostName: `webhook${i}.${process.env.DOMAIN}`,
-                port: process.env.PORT + i + 1,
+                port: parseInt(process.env.PORT) + i + 1
             }),
-            secret: process.env[`WEBHOOK_SECRET_${i}`],
-            legacySecrets: false
+            secret: process.env[`WEBHOOK_SECRET_${i}`]
         });
+        webhookMiddleware.start();
         webhooks.push(webhookMiddleware);
         webhookMiddleware.onSubscriptionCreateFailure((sub, err) => {
             logger.error(err);
