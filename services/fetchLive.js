@@ -28,6 +28,11 @@ class FetchLive {
             this.streamerAdded(alert.streamer_id);
         }
         logger.log("Subscriptions are ready", "ready");
+        setInterval((function (self) {
+            return function () {
+                self.checkCurrentStreams();
+            }
+        })(this), 200000, this);
         await this.checkCurrentStreams();
         logger.log("Streams status checked", "ready");
 
@@ -61,6 +66,7 @@ class FetchLive {
     }
 
     streamerAdded(streamer) {
+        return // Removed because it's not working
         if (!this.subscriptions.has(streamer)) {
             let webhookID = Math.floor(this.subscriptions.size / 2000);
             if (webhookID >= parseInt(process.env.WEBHOOK_CLIENTS)) {
@@ -93,6 +99,7 @@ class FetchLive {
     }
 
     async streamerRemoved(streamer) {
+        return // Removed because it's not working
         if (this.subscriptions.has(streamer)) {
             const alerts = await this.client.container.pg.listAlertsByStreamer(streamer);
             if (alerts.length === 0) {

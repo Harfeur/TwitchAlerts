@@ -10,6 +10,7 @@ module.exports = async client => {
     await client.application.commands.fetch();
 
     let webhooks = [];
+    /*
     for (let i = 0; i < parseInt(process.env.WEBHOOK_CLIENTS); i++) {
         const authProvider = new AppTokenAuthProvider(process.env[`WEBHOOK_CLIENT_${i}`], process.env[`WEBHOOK_SECRET_${i}`])
         const apiClient = new ApiClient({authProvider});
@@ -30,6 +31,7 @@ module.exports = async client => {
             logger.error("Revocation");
         });
     }
+    */
     const fl = new FetchLive(client, webhooks);
     client.container.pg.passFetchLive(fl);
 
