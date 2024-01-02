@@ -40,7 +40,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                         res.sendStatus(406);
                         return;
                     }
-                    await pgsql.editAlert(req.body.guild_id.replaceAll("'", "''"), req.body.streamer_id, user.id, req.body.start.replaceAll("'", "''"), req.body.end.replaceAll("'", "''"), req.body.display_game, req.body.display_viewers)
+                    await pgsql.editAlert(req.body.guild_id, req.body.streamer_id, user.id, req.body.start, req.body.end, req.body.display_game, req.body.display_viewers)
                     res.send({
                         id: user.id,
                         displayName: user.displayName,
@@ -89,7 +89,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 }
 
                 try {
-                    await pgsql.moveAlert(req.body.guild_id.replaceAll("'", "''"), req.body.streamer_id, channel.id);
+                    await pgsql.moveAlert(req.body.guild_id, req.body.streamer_id, channel.id);
                     res.send({
                         channel_id: channel.id, channel_name: channel.name
                     });
@@ -142,7 +142,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                         res.sendStatus(406);
                         return;
                     }
-                    await pgsql.addAlert(req.body.guild_id.replaceAll("'", "''"), user.id, channel.id, req.body.start.replaceAll("'", "''"), req.body.end.replaceAll("'", "''"), req.body.display_game, req.body.display_viewers);
+                    await pgsql.addAlert(req.body.guild_id, user.id, channel.id, req.body.start, req.body.end, req.body.display_game, req.body.display_viewers);
                     res.send({
                         alert: {
                             icon: user.profilePictureUrl,
@@ -186,7 +186,7 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                     return;
                 }
                 try {
-                    await pgsql.deleteAlert(req.body.guild_id.replaceAll("'", "''"), req.body.streamer_id);
+                    await pgsql.deleteAlert(req.body.guild_id, req.body.streamer_id);
                     res.send("Done");
                 } catch (err) {
                     if (err.code === "23505") res.sendStatus(409); else {

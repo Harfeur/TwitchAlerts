@@ -66,8 +66,8 @@ module.exports = class SetupController {
             return;
         }
 
-        const messageLIVE = interaction.fields.getTextInputValue("start").replaceAll("'", "''");
-        const messageFIN = interaction.fields.getTextInputValue("end").replaceAll("'", "''");
+        const messageLIVE = interaction.fields.getTextInputValue("start");
+        const messageFIN = interaction.fields.getTextInputValue("end");
 
         if (!client.container.debug) {
             await client.container.pg.addAlert(interaction.guild.id, user.id, interaction.channel.id, messageLIVE, messageFIN, true, true);
