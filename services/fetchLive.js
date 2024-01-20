@@ -23,11 +23,6 @@ class FetchLive {
         if (this.ready) return;
         this.ready = true;
 
-        const alerts = await this.client.container.pg.listAllAlerts();
-        for (const alert of alerts) {
-            this.streamerAdded(alert.streamer_id);
-        }
-        logger.log("Subscriptions are ready", "ready");
         setInterval((function (self) {
             return function () {
                 self.checkCurrentStreams();
@@ -35,17 +30,11 @@ class FetchLive {
         })(this), 200000, this);
         await this.checkCurrentStreams();
         logger.log("Streams status checked", "ready");
-
-        setInterval((function (self) {
-            return function () {
-                self.fetchLive();
-            }
-        })(this), 120000, this);
-        await this.fetchLive();
     }
 
     async checkCurrentStreams() {
         const alerts = await this.client.container.pg.listAllAlerts();
+        let oldAlerts = [];
         const alertsBy100 = [];
         while (alerts.length) {
             alertsBy100.push(alerts.splice(0, 100));
@@ -60,9 +49,11 @@ class FetchLive {
                     await this.client.container.pg.streamOnline(alert.streamer_id);
                 } else if (!stream && alert.streamer_live) {
                     await this.client.container.pg.streamOffline(alert.streamer_id);
+                    oldAlerts.push(alert);
                 }
             }
         }
+        await this.fetchLive(oldAlerts);
     }
 
     streamerAdded(streamer) {
@@ -124,7 +115,9 @@ class FetchLive {
                 embeds: [embed]
             }).then(msg => {
                 this.client.container.pg.setAlertMessage(alert.guild_id, alert.streamer_id, msg.id);
-            }).catch(logger.error);
+            }).catch(err => {
+                    logger.debug(`Can't send message in channel ${channel.id}`)
+                });
         } else {
             channel.messages.fetch(alert.alert_message)
                 .then(message => {
@@ -222,9 +215,9 @@ class FetchLive {
         }
     }
 
-    async fetchLive() {
+    async fetchLive(oldAlerts) {
         let alerts = await this.client.container.pg.listAllAlerts();
-        alerts = alerts.filter(alert => alert.streamer_live);
+        alerts = [...alerts.filter(alert => alert.streamer_live), ...oldAlerts];
         const nbAlerts = alerts.length;
         logger.debug(`Fetching live for ${nbAlerts} alerts ...`);
         const alertsBy100 = [];
