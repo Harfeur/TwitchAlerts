@@ -178,9 +178,9 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 }
 
                 data.alerts.push({
-                    icon: user.profilePictureUrl,
-                    name: user.displayName,
-                    id: user.id,
+                    icon: user?.profilePictureUrl ?? "",
+                    name: user?.displayName ?? alert.streamer_id,
+                    id: user?.id ?? alert.streamer_id,
                     channel_id: channel.id,
                     channel_name: channel.name,
                     start: alert.alert_start,

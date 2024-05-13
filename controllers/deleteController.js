@@ -24,8 +24,8 @@ module.exports = class DeleteController {
             let q = alerts[i];
             let user = await client.container.twitch.users.getUserById(q.streamer_id);
             menu.addOptions([{
-                label: user.displayName,
-                value: user.id,
+                label: user?.displayName ?? q.streamer_id,
+                value: user?.id ?? q.streamer_id,
                 description: guild.channels.resolve(q.alert_channel)?.name ?? interaction.getLocalizedString("DELETE_CHANNEL_NOT_FOUND", {canalid: q.alert_channel})
             }]);
         }
