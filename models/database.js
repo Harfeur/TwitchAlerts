@@ -84,7 +84,7 @@ class Database extends Client {
     }
     async moveAlert(guild_id, streamer, channel) {
         if (this.debug) return;
-        return await this.query("UPDATE alerts SET alert_channel=$1, WHERE streamer_id=$2 AND guild_id=$3",
+        return await this.query("UPDATE alerts SET alert_channel=$1 WHERE streamer_id=$2 AND guild_id=$3",
             [channel, streamer, guild_id]);
     }
     async deleteAlert(guild_id, streamer) {
