@@ -124,13 +124,12 @@ class FetchLive {
                     message.edit({
                         content: `${alert.alert_start}\n<https://www.twitch.tv/${user.name}>`,
                         embeds: [embed]
-                    }).catch(logger.error);
+                    }).catch(err => {
+                        logger.debug(`Can't edit message ${alert.alert_message} in channel ${channel.id}`);
+                    });
                 })
                 .catch(err => {
                     logger.debug(`Can't find message ${alert.alert_message} in channel ${channel.id}`)
-                    if (err.code === 10008) {
-                        this.client.container.pg.removeAlertMessage(alert.guild_id, alert.streamer_id);
-                    }
                 })
         }
     }
@@ -157,9 +156,13 @@ class FetchLive {
                             message.edit({
                                 content: alert.alert_end,
                                 embeds: [embed]
-                            }).catch(logger.error);
+                            }).catch(err => {
+                                logger.debug(`Can't edit message ${alert.alert_message} in channel ${channel.id}`);
+                            });
                         } else {
-                            message.edit(alert.alert_end).catch(logger.error);
+                            message.edit(alert.alert_end).catch(err => {
+                                logger.debug(`Can't edit message ${alert.alert_message} in channel ${channel.id}`);
+                            });
                         }
                     } else {
                         if (message.embeds.length > 0) {
@@ -170,12 +173,18 @@ class FetchLive {
                             message.edit({
                                 content: `${alert.alert_end} <${video.url}>`,
                                 embeds: [embed]
-                            }).catch(logger.error);
+                            }).catch(err => {
+                                logger.debug(`Can't edit message ${alert.alert_message} in channel ${channel.id}`);
+                            });
                         } else {
-                            message.edit(`${alert.alert_end} <${video.url}>`).catch(logger.error);
+                            message.edit(`${alert.alert_end} <${video.url}>`).catch(err => {
+                                logger.debug(`Can't edit message ${alert.alert_message} in channel ${channel.id}`);
+                            });
                         }
                     }
-                }).catch(logger.error);
+                }).catch(err => {
+                    logger.debug(`Can't find message ${alert.alert_message} in channel ${channel.id}`)
+            });
     }
 
     async updateAlert(alert, stream, user=null) {
