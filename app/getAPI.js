@@ -172,9 +172,10 @@ module.exports = function (app, pgsql, oauth, discord, twitch, functions, dirnam
                 try {
                     channel = await guild.channels.fetch(alert.alert_channel);
                 } catch (e) {
-                    logger.error(e);
-                    res.sendStatus(500);
-                    return;
+                    channel = {
+                        id: alert.alert_channel,
+                        name: "unknown"
+                    }
                 }
 
                 data.alerts.push({
