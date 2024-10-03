@@ -39,6 +39,6 @@ module.exports = class GeneralController {
         message += "Mention everyone: " + everyone ? "✅" :  "❌";
         message += "Read Message History: " + readMsg ? "✅" :  "❌";
 
-        await interaction.editReply({message});
+        await interaction.editReply({content: message});
     }
 }
