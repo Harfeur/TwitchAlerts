@@ -33,11 +33,11 @@ module.exports = class GeneralController {
         const everyone = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.MentionEveryone);
         const readMsg = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.ReadMessageHistory);
 
-        message += "Send Message: " + sendMsg ? "✅" :  "❌";
-        message += "Embed Links: " + embedLinks ? "✅" :  "❌";
-        message += "View Channel: " + viewChan ? "✅" :  "❌";
-        message += "Mention everyone: " + everyone ? "✅" :  "❌";
-        message += "Read Message History: " + readMsg ? "✅" :  "❌";
+        message += `Send Message: ${sendMsg ? "✅" : "❌"}\n`;
+        message += `Embed Links: ${embedLinks ? "✅" : "❌"}\n`;
+        message += `View Channel: ${viewChan ? "✅" : "❌"}\n`;
+        message += `Mention everyone: ${everyone ? "✅" : "❌"}\n`;
+        message += `Read Message History: ${readMsg ? "✅" : "❌"}`;
 
         await interaction.editReply({content: message});
     }
