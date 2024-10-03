@@ -21,7 +21,7 @@ module.exports = class GeneralController {
     }
 
     static async checkperm(client, interaction) {
-        interaction.deferReply({ephemeral: true});
+        await interaction.deferReply({ephemeral: true});
 
         const channel = interaction.channel;
 
