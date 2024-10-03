@@ -1,4 +1,4 @@
-const {ActionRowBuilder} = require("discord.js");
+const {ActionRowBuilder, PermissionsBitField} = require("discord.js");
 const embedService = require("../models/embedService");
 const buttonService = require("../models/buttonService");
 
@@ -18,5 +18,27 @@ module.exports = class GeneralController {
                 buttonService.getLinkButton(interaction.getLocalizedString("INFO_SUPPORT"), "https://discord.gg/uY98wtmvXf")
             )
         if (!client.container.debug) await interaction.reply({embeds: [statsEmbed], components: [link]});
+    }
+
+    static async checkperm(client, interaction) {
+        interaction.deferReply({ephemeral: true});
+
+        const channel = interaction.channel;
+
+        let message = `Permissions in <#${channel.id}>:`;
+
+        const sendMsg = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.SendMessages);
+        const embedLinks = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.EmbedLinks);
+        const viewChan = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.ViewChannel);
+        const everyone = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.MentionEveryone);
+        const readMsg = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.ReadMessageHistory);
+
+        message += "Send Message: " + sendMsg ? "✅" :  "❌";
+        message += "Embed Links: " + embedLinks ? "✅" :  "❌";
+        message += "View Channel: " + viewChan ? "✅" :  "❌";
+        message += "Mention everyone: " + everyone ? "✅" :  "❌";
+        message += "Read Message History: " + readMsg ? "✅" :  "❌";
+
+        await interaction.editReply({message});
     }
 }

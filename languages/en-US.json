@@ -53,5 +53,7 @@
     "LANGUAGE_DEFAULT": "Server language",
     "INFO_CMD_NAME": "info",
     "INFO_CMD_DESC": "Show Twitch Alerts bot information and help",
-    "LANGUAGE": "English"
+    "LANGUAGE": "English",
+    "CHECKPERM_CMD_NAME": "checkperm",
+    "CHECKPERM_CMD_DESC": "Check if the bot has all the required permissions in this channel."
 }
