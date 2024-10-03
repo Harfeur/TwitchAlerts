@@ -25,7 +25,7 @@ module.exports = class GeneralController {
 
         const channel = interaction.channel;
 
-        let message = `Permissions in <#${channel.id}>:`;
+        let message = `Permissions in <#${channel.id}>:\n`;
 
         const sendMsg = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.SendMessages);
         const embedLinks = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.EmbedLinks);
@@ -33,11 +33,11 @@ module.exports = class GeneralController {
         const everyone = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.MentionEveryone);
         const readMsg = channel.permissionsFor(client.user).has(PermissionsBitField.Flags.ReadMessageHistory);
 
-        message += `Send Message: ${sendMsg ? "✅" : "❌"}\n`;
-        message += `Embed Links: ${embedLinks ? "✅" : "❌"}\n`;
-        message += `View Channel: ${viewChan ? "✅" : "❌"}\n`;
-        message += `Mention everyone: ${everyone ? "✅" : "❌"}\n`;
-        message += `Read Message History: ${readMsg ? "✅" : "❌"}`;
+        message += `- Send Message: ${sendMsg ? "✅" : "❌"}\n`;
+        message += `- Embed Links: ${embedLinks ? "✅" : "❌"}\n`;
+        message += `- View Channel: ${viewChan ? "✅" : "❌"}\n`;
+        message += `- Mention everyone: ${everyone ? "✅" : "❌"}\n`;
+        message += `- Read Message History: ${readMsg ? "✅" : "❌"}`;
 
         await interaction.editReply({content: message});
     }
