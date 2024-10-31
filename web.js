@@ -30,7 +30,7 @@ async function init(pgsql, discord, twitch, fetchLive){
 // LAUNCH ========================================
     app.listen(process.env.PORT, async function () {
         logger.log(`Server started on port ${process.env.PORT}`);
-        await fetchLive.markAsReady();
+        fetchLive.markAsReady();
     });
 }
 

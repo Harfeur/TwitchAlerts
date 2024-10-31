@@ -29,12 +29,23 @@ class FetchLive {
         if (this.ready) return;
         this.ready = true;
 
+        while (true) {
+            logger.debug("Checking streams...");
+            await this.checkCurrentStreams();
+            await this.updateAlerts();
+            logger.debug("Alerts updated");
+        }
+
+        return;
+
         setInterval((function (self) {
-            return function () {
-                self.checkCurrentStreams();
-                self.updateAlerts();
+            return async function () {
+                logger.debug("Checking streams...");
+                await self.checkCurrentStreams();
+                await self.updateAlerts();
+                logger.debug("Alerts updated");
             }
-        })(this), 100000, this);
+        })(this), 200000, this);
         await this.checkCurrentStreams();
         await this.updateAlerts();
     }
@@ -76,7 +87,9 @@ class FetchLive {
         const alerts = await this.client.container.pg.listAllAlerts();
         for (const alert of alerts) {
             const stream = this.streamers.get(alert.streamer_id);
-            if (stream || alert.alert_message) this.updateAlert(alert, stream);
+            if (stream || alert.alert_message) {
+                await this.updateAlert(alert, stream);
+            }
         }
     }
 
@@ -193,13 +206,7 @@ class FetchLive {
             PermissionsBitField.Flags.ViewChannel,
             PermissionsBitField.Flags.ReadMessageHistory
         ])) {
-            const adminChannel = guild.publicUpdatesChannel;
-            if (adminChannel && (!adminChannel.lastMessage || (Date.now() - adminChannel.lastMessage.createdTimestamp) > 86400000)) {
-                // We send a message to the owner
-                adminChannel.send(`<@${this.client.id}> doesn't have the right permissions in <#${channel.id}>. Please check that using \`/checkperm\` in the given channel.
-                You can get more help on the bot server: https://discord.gg/uY98wtmvXf`).catch(err => {});
-            }
-            if (this.client.container.debug) logger.debug(`Channel ${alert.alert_channel} missing permissions`);
+            if (alert.alert_message) await this.client.container.pg.removeAlertMessage(alert.guild_id, alert.streamer_id);
             return;
         }
 
