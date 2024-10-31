@@ -11,10 +11,6 @@ class Database extends Client {
         this.debug = process.env.NODE_ENV !== "production";
     }
 
-    passFetchLive(fetchlive) {
-        this.fetchlive = fetchlive;
-    }
-
     async addNewGuild(guild_id) {
         if (this.debug) return;
         return await this.query("INSERT INTO guilds(guild_id) VALUES ($1) ON CONFLICT DO NOTHING", [guild_id]);
@@ -36,21 +32,21 @@ class Database extends Client {
     }
 
     async listAllAlerts() {
-        if (this.debug) return;
         return (await this.query("SELECT * FROM streamers JOIN alerts USING(streamer_id) JOIN guilds USING(guild_id)")).rows;
     }
 
+    async listAllStreamers() {
+        return (await this.query("SELECT * FROM streamers")).rows;
+    }
+
     async listAlertsByGuild(guild_id) {
-        if (this.debug) return;
         return (await this.query("SELECT * FROM streamers JOIN alerts USING(streamer_id) JOIN guilds USING(guild_id) WHERE guild_id=$1", [guild_id])).rows;
     }
     async countAlertsByGuild(guild_id) {
-        if (this.debug) return;
         return (await this.query("SELECT COUNT(streamer_id) AS count FROM alerts WHERE guild_id=$1", [guild_id])).rows[0].count;
     }
 
     async listAlertsByStreamer(streamer) {
-        if (this.debug) return;
         return (await this.query("SELECT * FROM streamers JOIN alerts USING(streamer_id) JOIN guilds USING(guild_id) WHERE streamer_id=$1", [streamer])).rows;
     }
 
@@ -69,7 +65,6 @@ class Database extends Client {
         await this.addStreamer(streamer);
         await this.query("INSERT INTO alerts(guild_id, streamer_id, alert_channel, alert_start, alert_end, alert_pref_display_game, alert_pref_display_viewers) VALUES ($1, $2, $3, $4, $5, $6, $7)",
             [guild_id, streamer, channel, start, end, display_game, display_viewers]);
-        this.fetchlive.streamerAdded(streamer);
     }
     async editAlert(guild_id, oldStreamer, newStreamer, start, end, display_game, display_viewers) {
         if (this.debug) return;
@@ -78,8 +73,6 @@ class Database extends Client {
             [start, end, newStreamer, display_game, display_viewers, oldStreamer, guild_id]);
         if (oldStreamer !== newStreamer) {
             await this.removeStreamerIfEmpty(oldStreamer);
-            await this.fetchlive.streamerRemoved(oldStreamer);
-            this.fetchlive.streamerAdded(newStreamer);
         }
     }
     async moveAlert(guild_id, streamer, channel) {
@@ -91,15 +84,6 @@ class Database extends Client {
         if (this.debug) return;
         await this.query("DELETE FROM alerts WHERE guild_id=$1 AND streamer_id=$2", [guild_id, streamer]);
         await this.removeStreamerIfEmpty(streamer);
-        await this.fetchlive.streamerRemoved(streamer);
-    }
-    async streamOnline(streamer) {
-        if (this.debug) return;
-        return await this.query("UPDATE streamers SET streamer_live=true WHERE streamer_id=$1", [streamer]);
-    }
-    async streamOffline(streamer) {
-        if (this.debug) return;
-        return await this.query("UPDATE streamers SET streamer_live=false WHERE streamer_id=$1", [streamer]);
     }
     async setAlertMessage(guild_id, streamer, message) {
         if (this.debug) return;
@@ -113,8 +97,12 @@ class Database extends Client {
     }
 
     async getAlert(guild_id, streamer) {
-        if (this.debug) return;
         return (await this.query("SELECT * FROM streamers JOIN alerts USING(streamer_id) JOIN guilds USING(guild_id) WHERE guild_id=$1 AND streamer_id=$2", [guild_id, streamer])).rows;
+    }
+
+    async deleteFromID(id) {
+        if (this.debug) return;
+        return await this.query("DELETE FROM alerts WHERE guild_id=$1 OR alert_channel=$1", [id]);
     }
 }
 

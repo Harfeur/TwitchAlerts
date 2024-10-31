@@ -17,6 +17,12 @@ class FetchLive {
         this.ready = false;
 
         this.subscriptions = new Map();
+
+        // Stores data of current streams
+        this.streamers = new Map();
+
+        // Stores guild or channel not found to delete old alerts
+        this.notfound = new Map();
     }
 
     async markAsReady() {
@@ -26,80 +32,51 @@ class FetchLive {
         setInterval((function (self) {
             return function () {
                 self.checkCurrentStreams();
+                self.updateAlerts();
             }
-        })(this), 200000, this);
+        })(this), 100000, this);
         await this.checkCurrentStreams();
-        logger.log("Streams status checked", "ready");
+        await this.updateAlerts();
+    }
+
+    deleteNotFound(id) {
+        if (!this.notfound.get(id)) this.notfound.set(id, 0);
+        this.notfound.set(id, this.notfound.get(id) + 1);
+
+        if (this.notfound.get(id) === 10) {
+            this.notfound.delete(id);
+            this.client.container.pg.deleteFromID(id);
+        }
     }
 
     async checkCurrentStreams() {
+        const s = Date.now()
+
+        const streamers = await this.client.container.pg.listAllStreamers();
+        while (streamers.length) {
+            // We take the first 100 streamers, because we're limited by Twitch
+            const streamers100 = streamers.splice(0, 100).map(s => s.streamer_id);
+            const streamsData = await this.client.container.twitch.streams.getStreamsByUserIds(streamers100);
+
+            // We save the data of the current stream in this.streamers.
+            for (const streamerID of streamers100) {
+                const stream = streamsData.filter(stream => stream.userId === streamerID)[0];
+                if (stream) {
+                    this.streamers.set(streamerID, stream);
+                } else {
+                    this.streamers.delete(streamerID);
+                }
+            }
+        }
+
+        logger.debug(`${this.streamers.size} streamers are streaming`);
+    }
+
+    async updateAlerts() {
         const alerts = await this.client.container.pg.listAllAlerts();
-        let oldAlerts = [];
-        const alertsBy100 = [];
-        while (alerts.length) {
-            alertsBy100.push(alerts.splice(0, 100));
-        }
-
-        for (const alertGroup of alertsBy100) {
-            const ids = alertGroup.map(a => a.streamer_id);
-            const streams = await this.client.container.twitch.streams.getStreamsByUserIds(ids);
-            for (const alert of alertGroup) {
-                let stream = streams.filter(stream => stream.userId === alert.streamer_id)[0];
-                if (stream && !alert.streamer_live) {
-                    await this.client.container.pg.streamOnline(alert.streamer_id);
-                } else if (!stream && alert.streamer_live) {
-                    await this.client.container.pg.streamOffline(alert.streamer_id);
-                    oldAlerts.push(alert);
-                }
-            }
-        }
-        await this.fetchLive(oldAlerts);
-    }
-
-    streamerAdded(streamer) {
-        return // Removed because it's not working
-        if (!this.subscriptions.has(streamer)) {
-            let webhookID = Math.floor(this.subscriptions.size / 2000);
-            if (webhookID >= parseInt(process.env.WEBHOOK_CLIENTS)) {
-                webhookID = parseInt(process.env.WEBHOOK_CLIENTS) - 1;
-                logger.warn("You need to add more webhooks clients !!");
-            }
-            const webhook = this.webhooks[webhookID] // Max 5000 streamers per webhook
-            const ev1 = webhook.onStreamOnline(streamer, async event => {
-                await this.client.container.pg.streamOnline(event.broadcasterId);
-                const alerts = await this.client.container.pg.listAlertsByStreamer(event.broadcasterId);
-                const stream = await event.getStream();
-
-                for (const alert of alerts) {
-                    await this.updateAlert(alert, stream);
-                }
-            });
-
-            const ev2 = webhook.onStreamOffline(streamer, async event => {
-                await this.client.container.pg.streamOffline(event.broadcasterId);
-                const alerts = await this.client.container.pg.listAlertsByStreamer(event.broadcasterId);
-
-                for (const alert of alerts) {
-                    await this.updateAlert(alert, null);
-                }
-            });
-
-            logger.debug(`Subscriptions on for ${streamer} on webhook${webhookID}`);
-            this.subscriptions.set(streamer, [webhook, ev1, ev2]);
-        }
-    }
-
-    async streamerRemoved(streamer) {
-        return // Removed because it's not working
-        if (this.subscriptions.has(streamer)) {
-            const alerts = await this.client.container.pg.listAlertsByStreamer(streamer);
-            if (alerts.length === 0) {
-                logger.debug(`Subscriptions off for ${streamer}`)
-                const sub = this.subscriptions.get(streamer);
-                sub[1].stop();
-                sub[2].stop();
-                this.subscriptions.delete(streamer);
-            }
+        for (const alert of alerts) {
+            const stream = this.streamers.get(alert.streamer_id);
+            if (stream || alert.alert_message) this.updateAlert(alert, stream);
         }
     }
 
@@ -136,17 +113,19 @@ class FetchLive {
 
     async showStreamOfflineMessage(alert, channel, lang) {
         await this.client.container.pg.removeAlertMessage(alert.guild_id, alert.streamer_id);
-
-        const videos = await this.client.container.twitch.videos.getVideosByUser(alert.streamer_id, {
-            limit: 1,
-            orderBy: "time",
-            type: "archive"
-        });
-        const video = videos.data.length !== 0 ? videos.data[0] : null
         if (alert.alert_message)
             channel.messages.fetch(alert.alert_message)
-                .then(message => {
+                .then(async message => {
+
+                    const videos = await this.client.container.twitch.videos.getVideosByUser(alert.streamer_id, {
+                        limit: 1,
+                        orderBy: "time",
+                        type: "archive"
+                    });
+                    const video = videos.data.length !== 0 ? videos.data[0] : null
+
                     let embed;
+
                     if (!video) {
                         // Pas de redif
                         if (message.embeds.length > 0) {
@@ -193,6 +172,7 @@ class FetchLive {
         try {
             guild = await this.client.guilds.fetch(alert.guild_id);
         } catch (e) {
+            this.deleteNotFound(alert.guild_id);
             if (this.client.container.debug) logger.debug(`Guild ${alert.guild_id} not found`);
             return;
         }
@@ -203,14 +183,22 @@ class FetchLive {
         try {
             channel = await guild.channels.fetch(alert.alert_channel);
         } catch (e) {
+            this.deleteNotFound(alert.alert_channel);
             if (this.client.container.debug) logger.debug(`Channel ${alert.alert_channel} not found`);
             return;
         }
         if (!channel.permissionsFor(this.client.user).has([
             PermissionsBitField.Flags.SendMessages,
             PermissionsBitField.Flags.EmbedLinks,
-            PermissionsBitField.Flags.ViewChannel
+            PermissionsBitField.Flags.ViewChannel,
+            PermissionsBitField.Flags.ReadMessageHistory
         ])) {
+            const adminChannel = guild.publicUpdatesChannel;
+            if (adminChannel && (!adminChannel.lastMessage || (Date.now() - adminChannel.lastMessage.createdTimestamp) > 86400000)) {
+                // We send a message to the owner
+                adminChannel.send(`<@${this.client.id}> doesn't have the right permissions in <#${channel.id}>. Please check that using \`/checkperm\` in the given channel.
+                You can get more help on the bot server: https://discord.gg/uY98wtmvXf`).catch(err => {});
+            }
             if (this.client.container.debug) logger.debug(`Channel ${alert.alert_channel} missing permissions`);
             return;
         }
@@ -222,31 +210,6 @@ class FetchLive {
         } else {
             await this.showStreamOfflineMessage(alert, channel, lang);
         }
-    }
-
-    async fetchLive(oldAlerts) {
-        let alerts = await this.client.container.pg.listAllAlerts();
-        alerts = [...alerts.filter(alert => alert.streamer_live), ...oldAlerts];
-        const nbAlerts = alerts.length;
-        logger.debug(`Fetching live for ${nbAlerts} alerts ...`);
-        const alertsBy100 = [];
-        while (alerts.length) {
-            alertsBy100.push(alerts.splice(0, 100));
-        }
-
-        for (const alertGroup of alertsBy100) {
-            const ids = alertGroup.map(a => a.streamer_id);
-            const streams = await this.client.container.twitch.streams.getStreamsByUserIds(ids);
-            const users = await this.client.container.twitch.users.getUsersByIds(ids);
-
-            for (const alert of alertGroup) {
-                const stream = streams.filter(stream => stream.userId === alert.streamer_id)[0];
-                const user = users.filter(user => user.id === alert.streamer_id)[0];
-
-                await this.updateAlert(alert, stream, user);
-            }
-        }
-        logger.debug(`Fetching live for ${nbAlerts} alerts ... done !`);
     }
 }
 

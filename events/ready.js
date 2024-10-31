@@ -33,7 +33,6 @@ module.exports = async client => {
     }
     */
     const fl = new FetchLive(client, webhooks);
-    client.container.pg.passFetchLive(fl);
 
     await require('../web.js')(client.container.pg, client, client.container.twitch, fl);
 };
