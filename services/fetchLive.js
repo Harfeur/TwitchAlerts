@@ -35,19 +35,6 @@ class FetchLive {
             await this.updateAlerts();
             logger.debug("Alerts updated");
         }
-
-        return;
-
-        setInterval((function (self) {
-            return async function () {
-                logger.debug("Checking streams...");
-                await self.checkCurrentStreams();
-                await self.updateAlerts();
-                logger.debug("Alerts updated");
-            }
-        })(this), 200000, this);
-        await this.checkCurrentStreams();
-        await this.updateAlerts();
     }
 
     deleteNotFound(id) {
