@@ -49,8 +49,11 @@ module.exports = class SetupController {
 
     static async modalSubmit(client, interaction) {
         if (!client.container.debug) await interaction.deferReply({ephemeral: true});
-
-        const user = await client.container.twitch.users.getUserByName(interaction.fields.getTextInputValue("streamer"));
+        let userName = interaction.fields.getTextInputValue("streamer");
+        if (userName.includes("twitch.tv/")) {
+            userName = userName.split("twitch.tv/")[1];
+        }
+        const user = await client.container.twitch.users.getUserByName(userName);
         if (!user) {
             logger.debug(`Failed to retrieve streamer ${interaction.fields.getTextInputValue("streamer")}`);
             if (!client.container.debug) await interaction.editReply(interaction.getLocalizedString("SETUP_NO_RESULT"));
