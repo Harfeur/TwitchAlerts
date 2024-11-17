@@ -30,10 +30,14 @@ class FetchLive {
         this.ready = true;
 
         while (true) {
-            logger.debug("Checking streams...");
-            await this.checkCurrentStreams();
-            await this.updateAlerts();
-            logger.debug("Alerts updated");
+            try {
+                logger.debug("Checking streams...");
+                await this.checkCurrentStreams();
+                await this.updateAlerts();
+                logger.debug("Alerts updated");
+            } catch (error) {
+                logger.error(error);
+            }
         }
     }
 
