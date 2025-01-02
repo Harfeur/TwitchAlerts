@@ -115,7 +115,9 @@ class FetchLive {
         }
     }
 
-    async showStreamOfflineMessage(alert, channel, lang) {
+    async showStreamOfflineMessage(alert, channel, user, lang) {
+        if (!user) user = await this.client.container.twitch.users.getUserById(alert.streamer_id);
+
         await this.client.container.pg.removeAlertMessage(alert.guild_id, alert.streamer_id);
         if (alert.alert_message)
             channel.messages.fetch(alert.alert_message)
@@ -134,7 +136,7 @@ class FetchLive {
                         // Pas de redif
                         if (message.embeds.length > 0) {
                             embed = new EmbedBuilder(message.embeds[0].data);
-                            embed.setTitle(getString(lang, "LIVE_END"));
+                            embed.setTitle(`${user.displayName} - ${getString(lang, "LIVE_END")}`);
                             embed.setFields(embed.data.fields.filter(field => field.name !== getString(lang, "VIEWERS")));
                             message.edit({
                                 content: alert.alert_end,
@@ -150,7 +152,7 @@ class FetchLive {
                     } else {
                         if (message.embeds.length > 0) {
                             embed = new EmbedBuilder(message.embeds[0].data);
-                            embed.setTitle(getString(lang, "LIVE_END"));
+                            embed.setTitle(`${user.displayName} - ${getString(lang, "LIVE_END")}`);
                             embed.setFields(embed.data.fields.filter(field => field.name !== getString(lang, "VIEWERS")));
                             embed.setURL(video.url);
                             message.edit({
@@ -206,7 +208,7 @@ class FetchLive {
         if (stream) {
             await this.showStreamOnlineMessage(alert, stream, channel, user, lang);
         } else {
-            await this.showStreamOfflineMessage(alert, channel, lang);
+            await this.showStreamOfflineMessage(alert, channel, user, lang);
         }
     }
 }
