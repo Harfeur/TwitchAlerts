@@ -62,6 +62,7 @@ class FetchLive {
 
             // We save the data of the current stream in this.streamers.
             for (const streamerID of streamers100) {
+                if (process.env.BLOCKED?.includes(streamerID)) continue;
                 const stream = streamsData.filter(stream => stream.userId === streamerID)[0];
                 if (stream) {
                     this.streamers.set(streamerID, stream);
