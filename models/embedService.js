@@ -74,13 +74,15 @@ module.exports = {
         const now = Date.now();
         const debut = stream.startDate;
 
+        let displayName = user.displayName.replaceAll("_", "\_");
+
         const heures = Math.trunc(((now - debut) / 60000) / 60);
         const minutes = Math.trunc((now - debut) / 60000 - heures * 60);
 
         const embed = new EmbedBuilder()
             .setColor(9442302)
             .setTimestamp(debut)
-            .setTitle("🔴 " + getString(lang, "TITLE", {name: user.displayName}))
+            .setTitle("🔴 " + getString(lang, "TITLE", {name: displayName}))
             .setURL(`https://www.twitch.tv/${user.name}`)
             .setThumbnail(user.profilePictureUrl)
             .setFooter({

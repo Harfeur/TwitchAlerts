@@ -89,14 +89,14 @@ class FetchLive {
         if (!user) user = await stream.getUser();
         const game = await stream.getGame();
 
-        user.name = user.name.replaceAll("_", "\_")
-        user.displayName = user.displayName.replaceAll("_", "\_")
+        let name = user.name.replaceAll("_", "\_")
+        let displayName = user.displayName.replaceAll("_", "\_")
 
         const embed = await generateLiveEmbed(user, stream, game, alert, lang)
 
         if (!alert.alert_message) {
             channel.send({
-                content: `${alert.alert_start}\n<https://www.twitch.tv/${user.name}>`,
+                content: `${alert.alert_start}\n<https://www.twitch.tv/${name}>`,
                 embeds: [embed]
             }).then(msg => {
                 this.client.container.pg.setAlertMessage(alert.guild_id, alert.streamer_id, msg.id);
@@ -107,7 +107,7 @@ class FetchLive {
             channel.messages.fetch(alert.alert_message)
                 .then(message => {
                     message.edit({
-                        content: `${alert.alert_start}\n<https://www.twitch.tv/${user.name}>`,
+                        content: `${alert.alert_start}\n<https://www.twitch.tv/${name}>`,
                         embeds: [embed]
                     }).catch(err => {
                         logger.debug(`Can't edit message ${alert.alert_message} in channel ${channel.id}`);
@@ -122,7 +122,7 @@ class FetchLive {
     async showStreamOfflineMessage(alert, channel, user, lang) {
         if (!user) user = await this.client.container.twitch.users.getUserById(alert.streamer_id);
 
-        user.displayName = user.displayName.replaceAll("_", "\_")
+        let displayName = user.displayName.replaceAll("_", "\_")
 
         await this.client.container.pg.removeAlertMessage(alert.guild_id, alert.streamer_id);
         if (alert.alert_message)
@@ -142,7 +142,7 @@ class FetchLive {
                         // Pas de redif
                         if (message.embeds.length > 0) {
                             embed = new EmbedBuilder(message.embeds[0].data);
-                            embed.setTitle(`${user.displayName} - ${getString(lang, "LIVE_END")}`);
+                            embed.setTitle(`${displayName} - ${getString(lang, "LIVE_END")}`);
                             embed.setFields(embed.data.fields.filter(field => field.name !== getString(lang, "VIEWERS")));
                             message.edit({
                                 content: alert.alert_end,
@@ -158,7 +158,7 @@ class FetchLive {
                     } else {
                         if (message.embeds.length > 0) {
                             embed = new EmbedBuilder(message.embeds[0].data);
-                            embed.setTitle(`${user.displayName} - ${getString(lang, "LIVE_END")}`);
+                            embed.setTitle(`${displayName} - ${getString(lang, "LIVE_END")}`);
                             embed.setFields(embed.data.fields.filter(field => field.name !== getString(lang, "VIEWERS")));
                             embed.setURL(video.url);
                             message.edit({
