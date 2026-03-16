@@ -89,6 +89,9 @@ class FetchLive {
         if (!user) user = await stream.getUser();
         const game = await stream.getGame();
 
+        user.name = user.name.replaceAll("_", "\_")
+        user.displayName = user.displayName.replaceAll("_", "\_")
+
         const embed = await generateLiveEmbed(user, stream, game, alert, lang)
 
         if (!alert.alert_message) {
@@ -118,6 +121,8 @@ class FetchLive {
 
     async showStreamOfflineMessage(alert, channel, user, lang) {
         if (!user) user = await this.client.container.twitch.users.getUserById(alert.streamer_id);
+
+        user.displayName = user.displayName.replaceAll("_", "\_")
 
         await this.client.container.pg.removeAlertMessage(alert.guild_id, alert.streamer_id);
         if (alert.alert_message)
