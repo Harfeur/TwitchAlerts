@@ -121,6 +121,7 @@ class FetchLive {
 
     async showStreamOfflineMessage(alert, channel, user, lang) {
         if (!user) user = await this.client.container.twitch.users.getUserById(alert.streamer_id);
+        if (!user) return; /* Return if there is still no user (maybe he's ban) */
 
         let displayName = user.displayName.replaceAll("_", "\_")
 
